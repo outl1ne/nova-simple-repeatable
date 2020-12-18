@@ -9,15 +9,29 @@
           </div>
         </div>
 
-        <div v-for="(fields, i) in fieldsWithValues" :key="i" class="simple-repeatable-row flex py-2">
-          <component
-            v-for="(repField, i) in fields"
-            :key="i"
-            :is="`form-${repField.component}`"
-            :field="repField"
-            class="mr-2"
-          />
-        </div>
+        <draggable v-model="fieldsWithValues" :options="{ handle: '.vue-draggable-handle' }">
+          <div
+            v-for="fields in fieldsWithValues"
+            :key="fields[0].attribute"
+            class="simple-repeatable-row flex py-2 pl-2 relative"
+          >
+            <div class="vue-draggable-handle absolute flex justify-center items-center cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" class="fill-current">
+                <path
+                  d="M4 5h16a1 1 0 0 1 0 2H4a1 1 0 1 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2zm0 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2z"
+                />
+              </svg>
+            </div>
+
+            <component
+              v-for="(repField, i) in fields"
+              :key="i"
+              :is="`form-${repField.component}`"
+              :field="repField"
+              class="mr-2"
+            />
+          </div>
+        </draggable>
 
         <button @click="addRow" class="btn btn-default btn-primary" type="button">Add row</button>
       </div>
@@ -26,10 +40,15 @@
 </template>
 
 <script>
+import Draggable from 'vuedraggable';
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
+
+let UNIQUE_ID_INDEX = 0;
 
 export default {
   mixins: [FormField, HandlesValidationErrors],
+
+  components: { Draggable },
 
   props: ['resourceName', 'resourceId', 'field'],
 
@@ -54,7 +73,11 @@ export default {
     },
 
     copyFields(value) {
-      return this.field.repeatableFields.map(field => ({ ...field, value: value[field.attribute] }));
+      return this.field.repeatableFields.map(field => ({
+        ...field,
+        attribute: `${field.attribute}---${UNIQUE_ID_INDEX++}`,
+        value: value && value[field.attribute],
+      }));
     },
 
     fill(formData) {
@@ -66,7 +89,9 @@ export default {
         for (const field of fields) {
           const formData = new FormData();
           field.fill(formData);
-          rowValues[field.attribute] = formData.get(field.attribute);
+
+          const normalizedAttribute = field.attribute.replace(/---\d+/, '');
+          rowValues[normalizedAttribute] = formData.get(field.attribute);
         }
 
         allValues.push(rowValues);
@@ -109,9 +134,10 @@ export default {
     // Select field
     > * {
       width: 100%;
+      border: none !important;
 
       // Hide name
-      > :nth-child(1) {
+      > :not(svg):nth-child(1) {
         display: none;
       }
 
@@ -121,6 +147,25 @@ export default {
         padding: 0 !important;
       }
     }
+
+    .vue-draggable-handle {
+      height: 36px;
+      width: 36px;
+      left: -36px;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  > :nth-child(1) {
+    min-width: 20%;
+  }
+
+  // Make field area full width
+  > :nth-child(2) {
+    width: 100% !important;
   }
 }
 </style>
