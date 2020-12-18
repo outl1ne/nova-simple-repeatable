@@ -1,0 +1,36 @@
+{
+  "name": "optimistdigital/nova-simple-repeatable",
+  "description": "A Laravel Nova simple repeatable rows field.",
+  "keywords": [
+    "laravel",
+    "nova",
+    "repeatable",
+    "flexible",
+    "rows",
+    "keyvalue",
+    "field"
+  ],
+  "license": "MIT",
+  "require": {
+    "php": ">=7.2.0",
+    "laravel/nova": "^3.0",
+    "optimistdigital/nova-translations-loader": "^3.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "OptimistDigital\\NovaSimpleRepeatable\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "OptimistDigital\\NovaSimpleRepeatable\\SimpleRepeatableServiceProvider"
+      ]
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
