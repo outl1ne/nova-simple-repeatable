@@ -1,6 +1,17 @@
 <template>
   <default-field :field="field" :errors="errors" :show-help-text="showHelpText">
-    <template slot="field"> </template>
+    <template slot="field">
+      <div class="flex flex-col">
+        <div class="flex">
+          <component
+            v-for="(repField, i) in field.repeatableFields"
+            :key="i"
+            :is="`form-${repField.component}`"
+            :field="repField"
+          />
+        </div>
+      </div>
+    </template>
   </default-field>
 </template>
 

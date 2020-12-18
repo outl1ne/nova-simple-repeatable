@@ -8,10 +8,14 @@ class SimpleRepeatable extends Field
 {
     public $component = 'simple-repeatable-field';
 
-    protected $storedWithVat = true;
+    protected $fields = [];
 
-    public function __construct($name, $attribute = null, $resolveCallback = null)
+    public function __construct($name, $attribute = null, $fields = [])
     {
-        parent::__construct($name, $attribute, $resolveCallback);
+        parent::__construct($name, $attribute, null);
+
+        $this->fields = $fields;
+
+        $this->withMeta(['fields' => $fields]);
     }
 }
