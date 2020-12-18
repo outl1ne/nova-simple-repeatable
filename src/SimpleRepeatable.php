@@ -6,7 +6,7 @@ use Laravel\Nova\Fields\Field;
 
 class SimpleRepeatable extends Field
 {
-    public $component = 'simple-repeatable-field';
+    public $component = 'simple-repeatable';
 
     protected $fields = [];
 
@@ -16,6 +16,6 @@ class SimpleRepeatable extends Field
 
         $this->fields = $fields;
 
-        $this->withMeta(['fields' => $fields]);
+        $this->withMeta(['repeatableFields' => $fields]);
     }
 }

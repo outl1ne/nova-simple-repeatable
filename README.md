@@ -3,7 +3,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/optimistdigital/nova-simple-repeatable.svg?style=flat-square)](https://packagist.org/packages/optimistdigital/nova-simple-repeatable)
 [![Total Downloads](https://img.shields.io/packagist/dt/optimistdigital/nova-simple-repeatable.svg?style=flat-square)](https://packagist.org/packages/optimistdigital/nova-simple-repeatable)
 
-This [Laravel Nova](https://nova.laravel.com/) package allows you to create and manage menus and menu items.
+This [Laravel Nova](https://nova.laravel.com/) package allows you to ...
 
 ## Requirements
 
