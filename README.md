@@ -37,7 +37,7 @@ public function fields(Request $request) {
         Text::make('Last name'),
         Email::make('Email'),
       ])
-      ->canAddRows(true), // Optional, true by default
+      ->canAddRows(true) // Optional, true by default
       ->canDeleteRows(true), // Optional, true by default
 }
 ```
