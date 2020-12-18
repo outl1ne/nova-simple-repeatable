@@ -82,7 +82,13 @@ export default {
     setInitialValue() {
       let value = [];
       try {
-        value = JSON.parse(this.field.value) || [];
+        if (!this.field.value) {
+          value = [];
+        } else if (typeof this.field.value === 'string') {
+          value = JSON.parse(this.field.value) || [];
+        } else if (Array.isArray(this.field.value)) {
+          value = this.field.value;
+        }
       } catch (e) {
         value = [];
       }
