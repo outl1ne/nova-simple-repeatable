@@ -32,10 +32,11 @@ composer require optimistdigital/nova-simple-repeatable
 use OptimistDigital\NovaSimpleRepeatable\SimpleRepeatable;
 
 public function fields(Request $request) {
-    SimpleRepeatable::make('Products', 'products', [
-      Text::make('Name'),
-      Text::make('Real shit'),
-    ])
+    SimpleRepeatable::make('Users', 'users', [
+        Text::make('First name'),
+        Text::make('Last name'),
+        Email::make('Email'),
+      ])
       ->canAddRows(true), // Optional, true by default
       ->canDeleteRows(true), // Optional, true by default
 }
