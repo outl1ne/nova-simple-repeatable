@@ -11,7 +11,7 @@
 
         <draggable v-model="fieldsWithValues" :options="{ handle: '.vue-draggable-handle' }">
           <div
-            v-for="fields in fieldsWithValues"
+            v-for="(fields, i) in fieldsWithValues"
             :key="fields[0].attribute"
             class="simple-repeatable-row flex py-3 pl-3 relative rounded-md"
           >
@@ -30,10 +30,30 @@
               :field="repField"
               class="mr-3"
             />
+
+            <div
+              class="delete-icon flex justify-center items-center cursor-pointer"
+              @click="deleteRow(i)"
+              v-if="field.canDeleteRows"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="fill-current">
+                <path
+                  d="M8 6V4c0-1.1.9-2 2-2h4a2 2 0 012 2v2h5a1 1 0 010 2h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V8H3a1 1 0 110-2h5zM6 8v12h12V8H6zm8-2V4h-4v2h4zm-4 4a1 1 0 011 1v6a1 1 0 01-2 0v-6a1 1 0 011-1zm4 0a1 1 0 011 1v6a1 1 0 01-2 0v-6a1 1 0 011-1z"
+                />
+              </svg>
+            </div>
           </div>
         </draggable>
 
-        <button @click="addRow" class="btn btn-default btn-primary" type="button">Add row</button>
+        <button
+          v-if="field.canAddRows"
+          @click="addRow"
+          class="add-button btn btn-default btn-primary mt-3"
+          :class="{ 'delete-width': field.canDeleteRows }"
+          type="button"
+        >
+          {{ __('simpleRepeatable.addRow') }}
+        </button>
       </div>
     </template>
   </default-field>
@@ -68,8 +88,6 @@ export default {
       }
 
       this.fieldsWithValues = value.map(this.copyFields);
-
-      console.info(this.fieldsWithValues);
     },
 
     copyFields(value) {
@@ -103,6 +121,10 @@ export default {
     addRow() {
       this.fieldsWithValues.push(this.copyFields());
     },
+
+    deleteRow(index) {
+      this.fieldsWithValues.splice(index, 1);
+    },
   },
 
   computed: {
@@ -130,7 +152,13 @@ export default {
 
 <style lang="scss" scoped>
 .simple-repeatable {
+  .simple-repeatable-header-row {
+    width: calc(100% - 10px);
+  }
+
   .simple-repeatable-row {
+    width: calc(100% + 68px);
+
     // Select field
     > * {
       width: 100%;
@@ -150,6 +178,21 @@ export default {
 
     margin-left: -46px;
 
+    .delete-icon {
+      width: 36px;
+      height: 36px;
+      margin-right: 10px;
+      cursor: pointer;
+
+      &:hover {
+        cursor: pointer;
+
+        > svg > path {
+          fill: var(--danger);
+        }
+      }
+    }
+
     .vue-draggable-handle {
       height: 36px;
       width: 36px;
@@ -162,6 +205,14 @@ export default {
 
     &:hover {
       background: var(--40);
+    }
+  }
+
+  .add-button {
+    width: calc(100% + 11px);
+
+    &.delete-width {
+      width: calc(100% - 22px);
     }
   }
 

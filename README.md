@@ -3,7 +3,7 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/optimistdigital/nova-simple-repeatable.svg?style=flat-square)](https://packagist.org/packages/optimistdigital/nova-simple-repeatable)
 [![Total Downloads](https://img.shields.io/packagist/dt/optimistdigital/nova-simple-repeatable.svg?style=flat-square)](https://packagist.org/packages/optimistdigital/nova-simple-repeatable)
 
-This [Laravel Nova](https://nova.laravel.com/) package allows you to ...
+This [Laravel Nova](https://nova.laravel.com/) package allows you to create simple horizontal rows of fields that the user can add/remove.
 
 ## Requirements
 
@@ -35,7 +35,9 @@ public function fields(Request $request) {
     SimpleRepeatable::make('Products', 'products', [
       Text::make('Name'),
       Text::make('Real shit'),
-    ]),
+    ])
+      ->canAddRows(true), // Optional, true by default
+      ->canDeleteRows(true), // Optional, true by default
 }
 ```
 
