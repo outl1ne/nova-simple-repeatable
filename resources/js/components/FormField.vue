@@ -23,13 +23,15 @@
               </svg>
             </div>
 
-            <component
-              v-for="(repField, i) in fields"
-              :key="i"
-              :is="`form-${repField.component}`"
-              :field="repField"
-              class="mr-3"
-            />
+            <div class="simple-repeatable-fields-wrapper w-full flex">
+              <component
+                v-for="(repField, i) in fields"
+                :key="i"
+                :is="`form-${repField.component}`"
+                :field="repField"
+                class="mr-3"
+              />
+            </div>
 
             <div
               class="delete-icon flex justify-center items-center cursor-pointer"
@@ -156,29 +158,48 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .simple-repeatable {
   .simple-repeatable-header-row {
-    width: calc(100% - 10px);
+    width: 100%;
   }
 
   .simple-repeatable-row {
     width: calc(100% + 68px);
 
-    // Select field
-    > * {
-      width: 100%;
-      border: none !important;
+    > .simple-repeatable-fields-wrapper {
+      > * {
+        flex: 1;
+        flex-shrink: 0;
+        min-width: 0px;
+        border: none !important;
 
-      // Hide name
-      > :not(svg):nth-child(1) {
-        display: none;
-      }
+        // Hide name
+        > *:nth-child(1):not(:only-child) {
+          display: none;
+        }
 
-      // Fix field width and padding
-      > :nth-child(2) {
-        width: 100% !important;
-        padding: 0 !important;
+        > *:only-child {
+          > *:nth-child(1):not(:only-child) {
+            display: none;
+          }
+
+          > :nth-child(2) {
+            width: 100% !important;
+            padding: 0 !important;
+          }
+        }
+
+        // Improve compatibility with nova-compact-theme
+        .compact-nova-field-wrapper {
+          padding: 0 !important;
+        }
+
+        // Fix field width and padding
+        > :nth-child(2) {
+          width: 100% !important;
+          padding: 0 !important;
+        }
       }
     }
 
