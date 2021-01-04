@@ -243,13 +243,26 @@ export default {
     }
   }
 
-  > :nth-child(1) {
-    min-width: 20%;
+  > *:not(:only-child) {
+    > :nth-child(1) {
+      min-width: 20%;
+    }
+
+    // Make field area full width
+    > :nth-child(2) {
+      width: 100% !important;
+    }
   }
 
-  // Make field area full width
-  > :nth-child(2) {
-    width: 100% !important;
+  > *:only-child {
+    > *:nth-child(1) {
+      min-width: 20%;
+    }
+
+    // Make field area full width
+    > *:nth-child(2) {
+      width: 100% !important;
+    }
   }
 }
 </style>
