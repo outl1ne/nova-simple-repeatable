@@ -251,6 +251,7 @@ export default {
     // Make field area full width
     > :nth-child(2) {
       width: 100% !important;
+      margin-right: 24px;
     }
   }
 
@@ -262,6 +263,7 @@ export default {
     // Make field area full width
     > *:nth-child(2) {
       width: 100% !important;
+      margin-right: 24px;
     }
   }
 }
