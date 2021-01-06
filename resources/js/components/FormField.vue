@@ -161,8 +161,6 @@ export default {
         errors[fieldIndex] = new Errors(errorsForThisIndex);
       });
 
-      console.info(errors);
-
       return errors;
     },
   },
