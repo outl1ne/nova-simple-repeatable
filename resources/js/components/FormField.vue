@@ -25,10 +25,11 @@
 
             <div class="simple-repeatable-fields-wrapper w-full flex">
               <component
-                v-for="(repField, i) in fields"
-                :key="i"
+                v-for="(repField, j) in fields"
+                :key="j"
                 :is="`form-${repField.component}`"
                 :field="repField"
+                :errors="repeatableErrors[i]"
                 class="mr-3"
               />
             </div>
@@ -63,6 +64,7 @@
 
 <script>
 import Draggable from 'vuedraggable';
+import { Errors } from 'form-backend-validation';
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
 
 let UNIQUE_ID_INDEX = 0;
@@ -136,23 +138,32 @@ export default {
   },
 
   computed: {
-    defaultAttributes() {
-      return {
-        type: 'number',
-        min: this.field.min,
-        max: this.field.max,
-        step: this.field.step,
-        pattern: this.field.pattern,
-        placeholder: this.field.placeholder || this.field.name,
-        class: this.errorClasses,
-      };
-    },
+    repeatableErrors() {
+      const errorKeys = Object.keys(this.errors.errors).filter(key => key.startsWith(this.field.attribute));
+      const uniqueErrorKeyMatches = [];
+      errorKeys.forEach(key => {
+        const match = key.match(/.+.(\d.)/)[0];
+        if (!uniqueErrorKeyMatches.find(key => key.startsWith(match))) uniqueErrorKeyMatches.push(match);
+      });
 
-    extraAttributes() {
-      return {
-        ...this.defaultAttributes,
-        ...this.field.extraAttributes,
-      };
+      const errors = {};
+      uniqueErrorKeyMatches.forEach(keyMatch => {
+        const keyWithoutPrefix = keyMatch.slice(this.field.attribute.length + 1);
+        const fieldIndex = keyWithoutPrefix.match(/(\d)./)[1];
+
+        const errorKeysForThisIndex = errorKeys.filter(key => key.startsWith(keyMatch));
+
+        const errorsForThisIndex = {};
+        errorKeysForThisIndex.forEach(errorKey => {
+          const fieldName = errorKey.slice(keyMatch.length);
+          errorsForThisIndex[fieldName] = this.errors.errors[errorKey];
+        });
+        errors[fieldIndex] = new Errors(errorsForThisIndex);
+      });
+
+      console.info(errors);
+
+      return errors;
     },
   },
 };
