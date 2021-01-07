@@ -1,7 +1,7 @@
 <template>
   <panel-item :field="field">
     <template slot="value">
-      <div class="overflow-hidden relative rounded-lg bg-white shadow border border-60" v-if="values">
+      <div class="overflow-hidden relative rounded-lg bg-white shadow border border-60" v-if="values && values.length">
         <table class="table w-full table-default nova-resource-table">
           <thead>
             <tr>
