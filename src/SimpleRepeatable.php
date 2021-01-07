@@ -22,6 +22,7 @@ class SimpleRepeatable extends Field
         $this->fields($fields);
         $this->canAddRows(true);
         $this->canDeleteRows(true);
+        $this->hideFromIndex();
     }
 
     public function canAddRows($canAddRows = true)
