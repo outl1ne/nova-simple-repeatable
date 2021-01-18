@@ -49,7 +49,7 @@
         </draggable>
 
         <button
-          v-if="field.canAddRows"
+          v-if="canAddRows"
           @click="addRow"
           class="add-button btn btn-default btn-primary mt-3"
           :class="{ 'delete-width': field.canDeleteRows }"
@@ -162,6 +162,12 @@ export default {
       });
 
       return errors;
+    },
+
+    canAddRows() {
+      if (!this.field.canAddRows) return false;
+      if (!!this.field.maxRows) return this.fieldsWithValues.length < this.field.maxRows;
+      return true;
     },
   },
 };
