@@ -252,18 +252,17 @@ export default {
     }
   }
 
-  > *:not(:only-child) {
-    > :nth-child(1) {
-      min-width: 20%;
-    }
-
-    // Make field area full width
-    > :nth-child(2) {
-      width: 100% !important;
-      margin-right: 24px;
-    }
+  > :nth-child(1) {
+    min-width: 20%;
   }
 
+  // Make field area full width
+  > :nth-child(2) {
+    width: 100% !important;
+    margin-right: 24px;
+  }
+
+  // Compact theme support
   > *:only-child {
     > *:nth-child(1) {
       min-width: 20%;
