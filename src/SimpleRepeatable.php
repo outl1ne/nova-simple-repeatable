@@ -36,6 +36,11 @@ class SimpleRepeatable extends Field
         return $this->withMeta(['repeatableFields' => $fields]);
     }
 
+    public function minRows($minRows = null)
+    {
+        return $this->withMeta(['minRows' => $minRows]);
+    }
+
     public function maxRows($maxRows = null)
     {
         return $this->withMeta(['maxRows' => $maxRows]);

@@ -35,9 +35,9 @@
             </div>
 
             <div
-              class="delete-icon flex justify-center items-center cursor-pointer"
+              v-if="canDeleteRow"
               @click="deleteRow(i)"
-              v-if="field.canDeleteRows"
+              class="delete-icon flex justify-center items-center cursor-pointer"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="fill-current">
                 <path
@@ -49,7 +49,7 @@
         </draggable>
 
         <button
-          v-if="canAddRows"
+          v-if="canAddRow"
           @click="addRow"
           class="add-button btn btn-default btn-primary mt-3"
           :class="{ 'delete-width': field.canDeleteRows }"
@@ -137,6 +137,15 @@ export default {
     },
   },
 
+  mounted() {
+    let diff = this.field.minRows - this.fieldsWithValues.length;
+    if (this.canAddRow() || this.fieldsWithValues.length === 0 || diff > 0) {
+      for (let i = 0; i < diff; i++) {
+        this.addRow();
+      }
+    }
+  },
+
   computed: {
     repeatableErrors() {
       const errorKeys = Object.keys(this.errors.errors).filter(key => key.startsWith(this.field.attribute));
@@ -164,9 +173,33 @@ export default {
       return errors;
     },
 
-    canAddRows() {
-      if (!this.field.canAddRows) return false;
-      if (!!this.field.maxRows) return this.fieldsWithValues.length < this.field.maxRows;
+    canAddRow() {
+      var rowCount = this.fieldsWithValues.length;
+      var minRows = this.field.minRows;
+      var maxRows = this.field.maxRows;
+
+      if (minRows !== null && maxRows !== null) {
+        return rowCount >= minRows && rowCount < maxRows && minRows !== maxRows;
+      } else if (minRows !== null) {
+        return rowCount >= minRows;
+      } else if (maxRows !== null) {
+        return rowCount < maxRows;
+      }
+      return true;
+    },
+
+    canDeleteRow() {
+      var rowCount = this.fieldsWithValues.length;
+      var minRows = this.field.minRows;
+      var maxRows = this.field.maxRows;
+
+      if (minRows !== null && maxRows !== null) {
+        return rowCount <= maxRows && rowCount > minRows;
+      } else if (minRows !== null) {
+        return rowCount > minRows;
+      } else if (maxRows !== null) {
+        return rowCount <= maxRows;
+      }
       return true;
     },
   },
