@@ -75,10 +75,11 @@ export default {
   components: { Draggable },
 
   props: ['resourceName', 'resourceId', 'field'],
+  
 
   data() {
     return {
-      fieldsWithValues: [],
+      fieldsWithValues: []
     };
   },
 
@@ -110,7 +111,6 @@ export default {
 
     fill(formData) {
       const allValues = [];
-
       for (const fields of this.fieldsWithValues) {
         const rowValues = {};
 
@@ -126,6 +126,36 @@ export default {
       }
 
       formData.append(this.field.attribute, JSON.stringify(allValues));
+    },
+
+    canDelete() {
+      var rowCount = this.fieldsWithValues.length;
+      var minRows = this.field.minRows;
+      var maxRows = this.field.maxRows;
+
+      if (minRows != null && maxRows != null) {
+        return rowCount <= maxRows && rowCount > minRows;
+      } else if (minRows != null) {
+        return rowCount > minRows;
+      } else if (maxRows != null) {
+        return rowCount <= maxRows;
+      }
+      return true;
+    },
+
+    canAdd() {
+      var rowCount = this.fieldsWithValues.length;
+      var minRows = this.field.minRows;
+      var maxRows = this.field.maxRows;
+
+      if (minRows != null && maxRows != null) {
+        return rowCount >= minRows && rowCount < maxRows && minRows !== maxRows;
+      } else if (minRows != null) {
+        return rowCount >= minRows;
+      } else if (maxRows != null) {
+        return rowCount < maxRows;
+      }
+      return true;
     },
 
     addRow() {
@@ -291,17 +321,18 @@ export default {
     }
   }
 
-  > :nth-child(1) {
-    min-width: 20%;
+  > *:not(:only-child) {
+    > :nth-child(1) {
+      min-width: 20%;
+    }
+
+    // Make field area full width
+    > :nth-child(2) {
+      width: 100% !important;
+      margin-right: 24px;
+    }
   }
 
-  // Make field area full width
-  > :nth-child(2) {
-    width: 100% !important;
-    margin-right: 24px;
-  }
-
-  // Compact theme support
   > *:only-child {
     > *:nth-child(1) {
       min-width: 20%;
