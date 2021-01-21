@@ -36,8 +36,8 @@
 
             <div
               class="delete-icon flex justify-center items-center cursor-pointer"
+              v-if="field.canDeleteRows && canDelete()"
               @click="deleteRow(i)"
-              v-if="field.canDeleteRows"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="fill-current">
                 <path
@@ -49,7 +49,7 @@
         </draggable>
 
         <button
-          v-if="canAddRows"
+          v-if="field.canAddRows && canAdd()"
           @click="addRow"
           class="add-button btn btn-default btn-primary mt-3"
           :class="{ 'delete-width': field.canDeleteRows }"
@@ -75,10 +75,11 @@ export default {
   components: { Draggable },
 
   props: ['resourceName', 'resourceId', 'field'],
+  
 
   data() {
     return {
-      fieldsWithValues: [],
+      fieldsWithValues: []
     };
   },
 
@@ -110,7 +111,6 @@ export default {
 
     fill(formData) {
       const allValues = [];
-
       for (const fields of this.fieldsWithValues) {
         const rowValues = {};
 
@@ -128,6 +128,36 @@ export default {
       formData.append(this.field.attribute, JSON.stringify(allValues));
     },
 
+    canDelete() {
+      var rowCount = this.fieldsWithValues.length;
+      var minRows = this.field.minRows;
+      var maxRows = this.field.maxRows;
+
+      if (minRows != null && maxRows != null) {
+        return rowCount <= maxRows && rowCount > minRows;
+      } else if (minRows != null) {
+        return rowCount > minRows;
+      } else if (maxRows != null) {
+        return rowCount <= maxRows;
+      }
+      return true;
+    },
+
+    canAdd() {
+      var rowCount = this.fieldsWithValues.length;
+      var minRows = this.field.minRows;
+      var maxRows = this.field.maxRows;
+
+      if (minRows != null && maxRows != null) {
+        return rowCount >= minRows && rowCount < maxRows && minRows !== maxRows;
+      } else if (minRows != null) {
+        return rowCount >= minRows;
+      } else if (maxRows != null) {
+        return rowCount < maxRows;
+      }
+      return true;
+    },
+
     addRow() {
       this.fieldsWithValues.push(this.copyFields());
     },
@@ -135,6 +165,15 @@ export default {
     deleteRow(index) {
       this.fieldsWithValues.splice(index, 1);
     },
+  },
+
+  mounted() {
+    var diff = this.field.minRows - this.fieldsWithValues.length;
+    if (this.canAdd() || Object.keys(this.fieldsWithValues).length === 0 || diff > 0) {
+      for (var i = 0; i < diff; i++) {
+        this.addRow();
+      }
+    }
   },
 
   computed: {
@@ -162,12 +201,6 @@ export default {
       });
 
       return errors;
-    },
-
-    canAddRows() {
-      if (!this.field.canAddRows) return false;
-      if (!!this.field.maxRows) return this.fieldsWithValues.length < this.field.maxRows;
-      return true;
     },
   },
 };
@@ -258,17 +291,18 @@ export default {
     }
   }
 
-  > :nth-child(1) {
-    min-width: 20%;
+  > *:not(:only-child) {
+    > :nth-child(1) {
+      min-width: 20%;
+    }
+
+    // Make field area full width
+    > :nth-child(2) {
+      width: 100% !important;
+      margin-right: 24px;
+    }
   }
 
-  // Make field area full width
-  > :nth-child(2) {
-    width: 100% !important;
-    margin-right: 24px;
-  }
-
-  // Compact theme support
   > *:only-child {
     > *:nth-child(1) {
       min-width: 20%;
