@@ -35,7 +35,7 @@
             </div>
 
             <div
-              v-if="canDeleteRow"
+              v-if="canDeleteRows"
               @click="deleteRow(i)"
               class="delete-icon flex justify-center items-center cursor-pointer"
             >
@@ -49,7 +49,7 @@
         </draggable>
 
         <button
-          v-if="canAddRow"
+          v-if="canAddRows"
           @click="addRow"
           class="add-button btn btn-default btn-primary mt-3"
           :class="{ 'delete-width': field.canDeleteRows }"
@@ -140,25 +140,12 @@ export default {
 
   mounted() {
     let diff = this.field.minRows - this.fieldsWithValues.length;
-    diff = (this.field.minRows > this.field.maxRows) ? this.field.maxRows : diff;
-    if (this.fieldsWithValues.length === 0 || diff > 0) {
-      for (let i = 0; i < diff; i++) {
-        this.addRow();
-      }
+    if (this.field.minRows && !isNaN(this.field.minRows) {
+      while(this.fieldsWithValues.length < this.field.minRows) this.addRow();
     }
   },
 
   computed: {
-    row() {
-      return {
-        rowCount: this.fieldsWithValues.length,
-        minRows: this.field.minRows,
-        maxRows: this.field.maxRows,
-        canAddRows: this.field.canAddRows,
-        canDeleteRows: this.field.canDeleteRows
-      }
-    },
-
     repeatableErrors() {
       const errorKeys = Object.keys(this.errors.errors).filter(key => key.startsWith(this.field.attribute));
       const uniqueErrorKeyMatches = [];
@@ -185,30 +172,15 @@ export default {
       return errors;
     },
 
-    canAddRow() {
-      if (this.row.minRows !== null && this.row.maxRows !== null && this.row.minRows !== undefined && this.row.maxRows !== undefined) {
-        return this.row.rowCount >= this.row.minRows && this.row.rowCount <
-          this.row.maxRows && this.row.minRows !== this.row.maxRows && this.row.canAddRows
-          && this.row.minRows > 0 && this.row.maxRows > 0;
-      } else if (this.row.minRows !== null  && this.row.minRows !== undefined) {
-        return this.row.rowCount >= this.row.minRows && this.row.canAddRows
-          && this.row.minRows >= 0;
-      } else if (this.row.maxRows !== null && this.row.maxRows !== undefined) {
-        return this.row.rowCount < this.row.maxRows && this.row.canAddRows
-          && this.row.maxRows > 0;
-      }
+    canAddRows() {
+      if (!this.field.canAddRows) return false;
+      if (this.field.maxRows) return this.fieldsWithValues.length < this.field.maxRows;
       return true;
     },
 
-    canDeleteRow() {
-      if (this.row.minRows !== null && this.row.maxRows !== null && this.row.minRows !== undefined && this.row.maxRows !== undefined) {
-        return this.row.rowCount <= this.row.maxRows && this.row.rowCount >
-          this.row.minRows && this.row.canDeleteRows;
-      } else if (this.row.minRows !== null && this.row.minRows !== undefined) {
-        return this.row.rowCount > this.row.minRows && this.row.canDeleteRows;
-      } else if (this.row.maxRows !== null && this.row.maxRows !== undefined) {
-        return this.row.rowCount <= this.row.maxRows && this.row.canDeleteRows;
-      }
+    canDeleteRows() {
+      if (!this.field.canDeleteRows) return false;
+      if (this.field.minRows) return this.fieldsWithValues.length > this.field.minRows;
       return true;
     },
   },
