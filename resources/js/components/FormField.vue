@@ -35,9 +35,9 @@
             </div>
 
             <div
+              class="delete-icon flex justify-center items-center cursor-pointer"
               v-if="canDeleteRows"
               @click="deleteRow(i)"
-              class="delete-icon flex justify-center items-center cursor-pointer"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="fill-current">
                 <path
@@ -75,7 +75,6 @@ export default {
   components: { Draggable },
 
   props: ['resourceName', 'resourceId', 'field'],
-  
 
   data() {
     return {
@@ -84,7 +83,6 @@ export default {
   },
 
   methods: {
-    
     setInitialValue() {
       let value = [];
       try {
@@ -112,6 +110,7 @@ export default {
 
     fill(formData) {
       const allValues = [];
+
       for (const fields of this.fieldsWithValues) {
         const rowValues = {};
 
@@ -139,7 +138,6 @@ export default {
   },
 
   mounted() {
-    let diff = this.field.minRows - this.fieldsWithValues.length;
     if (this.field.minRows && !isNaN(this.field.minRows) {
       while(this.fieldsWithValues.length < this.field.minRows) this.addRow();
     }
@@ -272,18 +270,17 @@ export default {
     }
   }
 
-  > *:not(:only-child) {
-    > :nth-child(1) {
-      min-width: 20%;
-    }
-
-    // Make field area full width
-    > :nth-child(2) {
-      width: 100% !important;
-      margin-right: 24px;
-    }
+  > :nth-child(1) {
+    min-width: 20%;
   }
 
+  // Make field area full width
+  > :nth-child(2) {
+    width: 100% !important;
+    margin-right: 24px;
+  }
+
+  // Compact theme support
   > *:only-child {
     > *:nth-child(1) {
       min-width: 20%;
