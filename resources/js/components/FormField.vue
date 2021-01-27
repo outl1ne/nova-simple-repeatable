@@ -4,17 +4,24 @@
       <div class="flex flex-col">
         <!-- Title columns -->
         <div class="simple-repeatable-header-row flex border-b border-40 py-2">
-          <div v-for="(repField, i) in field.repeatableFields" :key="i" class="font-bold text-90 text-md w-full mr-3">
+          <div v-for="(repField, i) in rows[0]" :key="i" class="font-bold text-90 text-md w-full mr-3 flex">
             {{ repField.name }}
+
+            <!--  If field is nova-translatable, render seperate locale-tabs   -->
+            <nova-translatable-locale-tabs
+              style="padding: 0"
+              class="ml-auto"
+              v-if="repField.component === 'translatable-field'"
+              :locales="getFieldLocales(repField.translatable.locales)"
+              :active-locale="activeLocale"
+              @tabClick="setAllLocales"
+              @dblclick="setAllLocales"
+            />
           </div>
         </div>
 
         <draggable v-model="fieldsWithValues" :options="{ handle: '.vue-draggable-handle' }">
-          <div
-            v-for="(fields, i) in fieldsWithValues"
-            :key="fields[0].attribute"
-            class="simple-repeatable-row flex py-3 pl-3 relative rounded-md"
-          >
+          <div v-for="(row, i) in field.rows" :key="i" class="simple-repeatable-row flex py-3 pl-3 relative rounded-md">
             <div class="vue-draggable-handle flex justify-center items-center cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" class="fill-current">
                 <path
@@ -25,7 +32,7 @@
 
             <div class="simple-repeatable-fields-wrapper w-full flex">
               <component
-                v-for="(repField, j) in fields"
+                v-for="(repField, j) in row.fields"
                 :key="j"
                 :is="`form-${repField.component}`"
                 :field="repField"
@@ -66,11 +73,12 @@
 import Draggable from 'vuedraggable';
 import { Errors } from 'form-backend-validation';
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
+import NovaTranslatableSupport from '../mixins/NovaTranslatableSupport';
 
 let UNIQUE_ID_INDEX = 0;
 
 export default {
-  mixins: [FormField, HandlesValidationErrors],
+  mixins: [FormField, HandlesValidationErrors, NovaTranslatableSupport],
 
   components: { Draggable },
 
@@ -78,48 +86,31 @@ export default {
 
   data() {
     return {
-      fieldsWithValues: [],
+      rows: [],
     };
   },
-
   methods: {
     setInitialValue() {
-      let value = [];
-      try {
-        if (!this.field.value) {
-          value = [];
-        } else if (typeof this.field.value === 'string') {
-          value = JSON.parse(this.field.value) || [];
-        } else if (Array.isArray(this.field.value)) {
-          value = this.field.value;
-        }
-      } catch (e) {
-        value = [];
-      }
-
-      this.fieldsWithValues = value.map(this.copyFields);
+      this.rows = this.field.rows.map(this.copyFields);
     },
 
     copyFields(value) {
-      return this.field.repeatableFields.map(field => ({
+      return value.fields.map(field => ({
         ...field,
         attribute: `${field.attribute}---${UNIQUE_ID_INDEX++}`,
-        value: value && value[field.attribute],
       }));
     },
 
     fill(formData) {
       const allValues = [];
 
-      for (const fields of this.fieldsWithValues) {
+      for (const row of this.rows) {
         const rowValues = {};
+        let formData = new FormData();
+        row.forEach(field => field.fill(formData));
 
-        for (const field of fields) {
-          const formData = new FormData();
-          field.fill(formData);
-
-          const normalizedAttribute = field.attribute.replace(/---\d+/, '');
-          rowValues[normalizedAttribute] = formData.get(field.attribute);
+        for (const item of formData) {
+          rowValues[item[0]] = item[1];
         }
 
         allValues.push(rowValues);
@@ -129,7 +120,7 @@ export default {
     },
 
     addRow() {
-      this.fieldsWithValues.push(this.copyFields());
+      this.rows.push(this.copyFields());
     },
 
     deleteRow(index) {
@@ -183,10 +174,12 @@ export default {
     width: calc(100% + 68px);
 
     > .simple-repeatable-fields-wrapper {
-      > * {
+      > *,
+        // Improve compatibility with nova-translatable
+      .translatable-field:nth-child(2) div {
         flex: 1;
         flex-shrink: 0;
-        min-width: 0px;
+        min-width: 0;
         border: none !important;
 
         // Hide name
