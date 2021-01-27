@@ -26,6 +26,6 @@ export default {
 
     setActiveLocale(newLocale) {
       this.activeLocale = newLocale;
-    }
+    },
   },
 };

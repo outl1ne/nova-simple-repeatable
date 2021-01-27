@@ -21,8 +21,11 @@
         </div>
 
         <draggable v-model="rows" handle=".vue-draggable-handle">
-          <div v-for="(row, i) in rows" :key="row[0].attribute"
-               class="simple-repeatable-row flex py-3 pl-3 relative rounded-md">
+          <div
+            v-for="(row, i) in rows"
+            :key="row[0].attribute"
+            class="simple-repeatable-row flex py-3 pl-3 relative rounded-md"
+          >
             <div class="vue-draggable-handle flex justify-center items-center cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" class="fill-current">
                 <path
@@ -92,7 +95,7 @@ export default {
   },
   methods: {
     setInitialValue() {
-      this.rows = this.field.rows.map((row) => this.copyFields(row.fields));
+      this.rows = this.field.rows.map(row => this.copyFields(row.fields));
     },
 
     assignUniqueAttributes(row) {

@@ -4,14 +4,14 @@
       <div class="overflow-hidden relative rounded-lg bg-white shadow border border-60" v-if="values && values.length">
         <table class="table w-full table-default nova-resource-table">
           <thead>
-          <tr>
-            <th v-for="(header, i) in headers" :key="i">{{ header.name }}</th>
-          </tr>
+            <tr>
+              <th v-for="(header, i) in headers" :key="i">{{ header.name }}</th>
+            </tr>
           </thead>
           <tbody>
-          <tr v-for="(row, i) of values" :key="i" class="nova-resource-table-row">
-            <td class="font-mono text-sm" style="height: 2rem" v-for="(value, i) in row" :key="i">{{ value }}</td>
-          </tr>
+            <tr v-for="(row, i) of values" :key="i" class="nova-resource-table-row">
+              <td class="font-mono text-sm" style="height: 2rem" v-for="(value, i) in row" :key="i">{{ value }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
