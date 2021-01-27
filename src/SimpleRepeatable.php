@@ -80,7 +80,12 @@ class SimpleRepeatable extends Field
             $row->resolve();
         });
 
-        $this->withMeta(['rows' => $this->rows]);
+        $this->withMeta([
+            'rows' => $this->rows,
+            'fields' => $this->fields->resolve(null) // Empty fields
+        ]);
+
+        parent::resolve($resource, $attribute);
     }
 
     public function buildRows($resource, $attribute)

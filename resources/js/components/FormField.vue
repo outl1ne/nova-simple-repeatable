@@ -13,15 +13,16 @@
               class="ml-auto"
               v-if="repField.component === 'translatable-field'"
               :locales="getFieldLocales(repField.translatable.locales)"
-              :active-locale="activeLocale"
+              :active-locale="activeLocale || getFieldLocales(repField.translatable.locales)[0].key"
               @tabClick="setAllLocales"
               @dblclick="setAllLocales"
             />
           </div>
         </div>
 
-        <draggable v-model="fieldsWithValues" :options="{ handle: '.vue-draggable-handle' }">
-          <div v-for="(row, i) in field.rows" :key="i" class="simple-repeatable-row flex py-3 pl-3 relative rounded-md">
+        <draggable v-model="rows" handle=".vue-draggable-handle">
+          <div v-for="(row, i) in rows" :key="row[0].attribute"
+               class="simple-repeatable-row flex py-3 pl-3 relative rounded-md">
             <div class="vue-draggable-handle flex justify-center items-center cursor-pointer">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" class="fill-current">
                 <path
@@ -32,7 +33,7 @@
 
             <div class="simple-repeatable-fields-wrapper w-full flex">
               <component
-                v-for="(repField, j) in row.fields"
+                v-for="(repField, j) in row"
                 :key="j"
                 :is="`form-${repField.component}`"
                 :field="repField"
@@ -91,13 +92,21 @@ export default {
   },
   methods: {
     setInitialValue() {
-      this.rows = this.field.rows.map(this.copyFields);
+      this.rows = this.field.rows.map((row) => this.copyFields(row.fields));
     },
 
-    copyFields(value) {
-      return value.fields.map(field => ({
+    assignUniqueAttributes(row) {
+      return row.fields.map(field => ({
         ...field,
         attribute: `${field.attribute}---${UNIQUE_ID_INDEX++}`,
+      }));
+    },
+
+    copyFields(fields) {
+      return fields.map(field => ({
+        ...field,
+        attribute: `${field.attribute}---${UNIQUE_ID_INDEX++}`,
+        value: field.value,
       }));
     },
 
@@ -110,7 +119,8 @@ export default {
         row.forEach(field => field.fill(formData));
 
         for (const item of formData) {
-          rowValues[item[0]] = item[1];
+          const normalizedAttribute = item[0].replace(/---\d+/, '');
+          rowValues[normalizedAttribute] = item[1];
         }
 
         allValues.push(rowValues);
@@ -120,11 +130,11 @@ export default {
     },
 
     addRow() {
-      this.rows.push(this.copyFields());
+      this.rows.push(this.copyFields(this.field.fields));
     },
 
     deleteRow(index) {
-      this.fieldsWithValues.splice(index, 1);
+      this.rows.splice(index, 1);
     },
   },
 

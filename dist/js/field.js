@@ -1870,9 +1870,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: ['resource', 'resourceName', 'resourceId', 'field'],
+  mounted: function mounted() {
+    console.log(this.values);
+  },
   computed: {
     values: function values() {
-      var headers = this.headers;
       var value = this.field.value;
       if (!value) return void 0;
       if (Array.isArray(value)) return this.handleValue(value);
@@ -1887,8 +1889,8 @@ __webpack_require__.r(__webpack_exports__);
       return this.handleValue(value);
     },
     headers: function headers() {
-      var fields = this.field.repeatableFields;
-      return fields.map(function (field) {
+      var rows = this.field.rows;
+      return rows[0].fields.map(function (field) {
         return {
           name: field.name,
           attribute: field.attribute
@@ -1898,7 +1900,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     handleValue: function handleValue(valuesArray) {
-      var fields = this.field.repeatableFields;
+      var fields = this.field.fields;
       var fieldsWithOptions = fields.filter(function (field) {
         return Array.isArray(field.options) && !!field.options.length;
       });
@@ -2047,6 +2049,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
 
 
 
@@ -2065,12 +2068,24 @@ var UNIQUE_ID_INDEX = 0;
   },
   methods: {
     setInitialValue: function setInitialValue() {
-      this.rows = this.field.rows.map(this.copyFields);
+      var _this = this;
+
+      this.rows = this.field.rows.map(function (row) {
+        return _this.copyFields(row.fields);
+      });
     },
-    copyFields: function copyFields(value) {
-      return value.fields.map(function (field) {
+    assignUniqueAttributes: function assignUniqueAttributes(row) {
+      return row.fields.map(function (field) {
         return _objectSpread(_objectSpread({}, field), {}, {
           attribute: "".concat(field.attribute, "---").concat(UNIQUE_ID_INDEX++)
+        });
+      });
+    },
+    copyFields: function copyFields(fields) {
+      return fields.map(function (field) {
+        return _objectSpread(_objectSpread({}, field), {}, {
+          attribute: "".concat(field.attribute, "---").concat(UNIQUE_ID_INDEX++),
+          value: field.value
         });
       });
     },
@@ -2095,7 +2110,8 @@ var UNIQUE_ID_INDEX = 0;
           try {
             for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
               var item = _step2.value;
-              rowValues[item[0]] = item[1];
+              var normalizedAttribute = item[0].replace(/---\d+/, '');
+              rowValues[normalizedAttribute] = item[1];
             }
           } catch (err) {
             _iterator2.e(err);
@@ -2118,18 +2134,18 @@ var UNIQUE_ID_INDEX = 0;
       formData.append(this.field.attribute, JSON.stringify(allValues));
     },
     addRow: function addRow() {
-      this.rows.push(this.copyFields());
+      this.rows.push(this.copyFields(this.field.fields));
     },
     deleteRow: function deleteRow(index) {
-      this.fieldsWithValues.splice(index, 1);
+      this.rows.splice(index, 1);
     }
   },
   computed: {
     repeatableErrors: function repeatableErrors() {
-      var _this = this;
+      var _this2 = this;
 
       var errorKeys = Object.keys(this.errors.errors).filter(function (key) {
-        return key.startsWith(_this.field.attribute);
+        return key.startsWith(_this2.field.attribute);
       });
       var uniqueErrorKeyMatches = [];
       errorKeys.forEach(function (key) {
@@ -2140,7 +2156,7 @@ var UNIQUE_ID_INDEX = 0;
       });
       var errors = {};
       uniqueErrorKeyMatches.forEach(function (keyMatch) {
-        var keyWithoutPrefix = keyMatch.slice(_this.field.attribute.length + 1);
+        var keyWithoutPrefix = keyMatch.slice(_this2.field.attribute.length + 1);
         var fieldIndex = keyWithoutPrefix.match(/(\d)./)[1];
         var errorKeysForThisIndex = errorKeys.filter(function (key) {
           return key.startsWith(keyMatch);
@@ -2148,7 +2164,7 @@ var UNIQUE_ID_INDEX = 0;
         var errorsForThisIndex = {};
         errorKeysForThisIndex.forEach(function (errorKey) {
           var fieldName = errorKey.slice(keyMatch.length);
-          errorsForThisIndex[fieldName] = _this.errors.errors[errorKey];
+          errorsForThisIndex[fieldName] = _this2.errors.errors[errorKey];
         });
         errors[fieldIndex] = new form_backend_validation__WEBPACK_IMPORTED_MODULE_1__.Errors(errorsForThisIndex);
       });
@@ -33917,7 +33933,11 @@ var render = function() {
                             locales: _vm.getFieldLocales(
                               repField.translatable.locales
                             ),
-                            "active-locale": _vm.activeLocale
+                            "active-locale":
+                              _vm.activeLocale ||
+                              _vm.getFieldLocales(
+                                repField.translatable.locales
+                              )[0].key
                           },
                           on: {
                             tabClick: _vm.setAllLocales,
@@ -33935,20 +33955,20 @@ var render = function() {
             _c(
               "draggable",
               {
-                attrs: { options: { handle: ".vue-draggable-handle" } },
+                attrs: { handle: ".vue-draggable-handle" },
                 model: {
-                  value: _vm.fieldsWithValues,
+                  value: _vm.rows,
                   callback: function($$v) {
-                    _vm.fieldsWithValues = $$v
+                    _vm.rows = $$v
                   },
-                  expression: "fieldsWithValues"
+                  expression: "rows"
                 }
               },
-              _vm._l(_vm.field.rows, function(row, i) {
+              _vm._l(_vm.rows, function(row, i) {
                 return _c(
                   "div",
                   {
-                    key: i,
+                    key: row[0].attribute,
                     staticClass:
                       "simple-repeatable-row flex py-3 pl-3 relative rounded-md"
                   },
@@ -33989,7 +34009,7 @@ var render = function() {
                         staticClass:
                           "simple-repeatable-fields-wrapper w-full flex"
                       },
-                      _vm._l(row.fields, function(repField, j) {
+                      _vm._l(row, function(repField, j) {
                         return _c("form-" + repField.component, {
                           key: j,
                           tag: "component",

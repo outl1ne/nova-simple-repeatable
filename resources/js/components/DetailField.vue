@@ -4,14 +4,14 @@
       <div class="overflow-hidden relative rounded-lg bg-white shadow border border-60" v-if="values && values.length">
         <table class="table w-full table-default nova-resource-table">
           <thead>
-            <tr>
-              <th v-for="(header, i) in headers" :key="i">{{ header.name }}</th>
-            </tr>
+          <tr>
+            <th v-for="(header, i) in headers" :key="i">{{ header.name }}</th>
+          </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, i) of values" :key="i" class="nova-resource-table-row">
-              <td class="font-mono text-sm" style="height: 2rem" v-for="(value, i) in row" :key="i">{{ value }}</td>
-            </tr>
+          <tr v-for="(row, i) of values" :key="i" class="nova-resource-table-row">
+            <td class="font-mono text-sm" style="height: 2rem" v-for="(value, i) in row" :key="i">{{ value }}</td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -24,11 +24,11 @@
 <script>
 export default {
   props: ['resource', 'resourceName', 'resourceId', 'field'],
-
+  mounted() {
+    console.log(this.values);
+  },
   computed: {
     values() {
-      const headers = this.headers;
-
       let value = this.field.value;
       if (!value) return void 0;
 
@@ -45,14 +45,14 @@ export default {
     },
 
     headers() {
-      const fields = this.field.repeatableFields;
-      return fields.map(field => ({ name: field.name, attribute: field.attribute }));
+      const rows = this.field.rows;
+      return rows[0].fields.map(field => ({ name: field.name, attribute: field.attribute }));
     },
   },
 
   methods: {
     handleValue(valuesArray) {
-      const fields = this.field.repeatableFields;
+      const fields = this.field.fields;
 
       const fieldsWithOptions = fields.filter(field => Array.isArray(field.options) && !!field.options.length);
       if (fieldsWithOptions.length > 0) {
