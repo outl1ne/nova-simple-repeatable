@@ -2,23 +2,19 @@
 
 namespace OptimistDigital\NovaSimpleRepeatable;
 
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Concerns\HasAttributes;
-use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
 use JsonSerializable;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Fields\FieldCollection;
 
-class Row implements Arrayable, JsonSerializable
+class Row implements JsonSerializable
 {
-    use HasAttributes, HidesAttributes;
-
     protected $fields;
+    protected $attributes;
 
     public function __construct($fields = null, $attributes = [])
     {
         $this->fields = new FieldCollection($fields);
-        $this->setRawAttributes($attributes);
+        $this->attributes = $attributes;
     }
 
     /**
@@ -42,7 +38,7 @@ class Row implements Arrayable, JsonSerializable
     public function resolve()
     {
         $this->fields->each(function ($field) {
-            $field->resolve(collect($this));
+            $field->resolve($this->attributes);
         });
     }
 
@@ -64,46 +60,6 @@ class Row implements Arrayable, JsonSerializable
         }
 
         return $field;
-    }
-
-    /**
-     * Convert the model instance to an array.
-     *
-     * @return array
-     */
-    public function toArray()
-    {
-        return $this->attributesToArray();
-    }
-
-    /**
-     * Get the attributes that should be converted to dates.
-     *
-     * @return array
-     */
-    protected function getDates()
-    {
-        return [];
-    }
-
-    /**
-     * Get the format for database stored dates.
-     *
-     * @return string
-     */
-    public function getDateFormat()
-    {
-        return 'Y-m-d H:i:s';
-    }
-
-    /**
-     * Get the casts array.
-     *
-     * @return array
-     */
-    public function getCasts()
-    {
-        return [];
     }
 
     public function jsonSerialize()
