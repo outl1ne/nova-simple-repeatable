@@ -76,9 +76,7 @@ class SimpleRepeatable extends Field
         $this->rows = $this->buildRows($resource, $attribute);
 
         // Resolve rows
-        $this->rows->each(function ($row) {
-            $row->resolve();
-        });
+        $this->rows->each->resolve();
 
         $this->withMeta([
             'rows' => $this->rows,

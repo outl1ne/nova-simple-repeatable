@@ -93,16 +93,10 @@ export default {
       rows: [],
     };
   },
+
   methods: {
     setInitialValue() {
       this.rows = this.field.rows.map(row => this.copyFields(row.fields));
-    },
-
-    assignUniqueAttributes(row) {
-      return row.fields.map(field => ({
-        ...field,
-        attribute: `${field.attribute}---${UNIQUE_ID_INDEX++}`,
-      }));
     },
 
     copyFields(fields) {
@@ -170,7 +164,7 @@ export default {
 
     canAddRows() {
       if (!this.field.canAddRows) return false;
-      if (!!this.field.maxRows) return this.fieldsWithValues.length < this.field.maxRows;
+      if (!!this.field.maxRows) return this.rows.length < this.field.maxRows;
       return true;
     },
   },

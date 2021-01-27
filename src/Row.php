@@ -37,9 +37,7 @@ class Row implements JsonSerializable
      */
     public function resolve()
     {
-        $this->fields->each(function ($field) {
-            $field->resolve($this->attributes);
-        });
+        $this->fields->each->resolve($this->attributes);
     }
 
     /**
