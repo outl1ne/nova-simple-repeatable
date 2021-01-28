@@ -25,11 +25,6 @@ class SimpleRepeatable extends Field
         $this->hideFromIndex();
     }
 
-    public function canAddRows($canAddRows = true)
-    {
-        return $this->withMeta(['canAddRows' => $canAddRows]);
-    }
-
     public function fields($fields = [])
     {
         $this->fields = $fields;
@@ -44,6 +39,11 @@ class SimpleRepeatable extends Field
     public function maxRows($maxRows = null)
     {
         return $this->withMeta(['maxRows' => $maxRows]);
+    }
+
+    public function canAddRows($canAddRows = true)
+    {
+        return $this->withMeta(['canAddRows' => $canAddRows]);
     }
 
     public function canDeleteRows($canDeleteRows = true)

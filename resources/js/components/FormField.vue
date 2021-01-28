@@ -52,7 +52,7 @@
           v-if="canAddRows"
           @click="addRow"
           class="add-button btn btn-default btn-primary mt-3"
-          :class="{ 'delete-width': field.canDeleteRows }"
+          :class="{ 'delete-width': canDeleteRows }"
           type="button"
         >
           {{ __('simpleRepeatable.addRow') }}
