@@ -4,15 +4,26 @@
       <div class="flex flex-col">
         <!-- Title columns -->
         <div class="simple-repeatable-header-row flex border-b border-40 py-2">
-          <div v-for="(repField, i) in field.repeatableFields" :key="i" class="font-bold text-90 text-md w-full mr-3">
-            {{ repField.name }}
+          <div v-for="(rowField, i) in rows[0]" :key="i" class="font-bold text-90 text-md w-full mr-3 flex">
+            {{ rowField.name }}
+
+            <!--  If field is nova-translatable, render seperate locale-tabs   -->
+            <nova-translatable-locale-tabs
+              style="padding: 0"
+              class="ml-auto"
+              v-if="rowField.component === 'translatable-field'"
+              :locales="getFieldLocales(rowField.translatable.locales)"
+              :active-locale="activeLocale || getFieldLocales(rowField.translatable.locales)[0].key"
+              @tabClick="setAllLocales"
+              @dblclick="setAllLocales"
+            />
           </div>
         </div>
 
-        <draggable v-model="fieldsWithValues" :options="{ handle: '.vue-draggable-handle' }">
+        <draggable v-model="rows" handle=".vue-draggable-handle">
           <div
-            v-for="(fields, i) in fieldsWithValues"
-            :key="fields[0].attribute"
+            v-for="(row, i) in rows"
+            :key="row[0].attribute"
             class="simple-repeatable-row flex py-3 pl-3 relative rounded-md"
           >
             <div class="vue-draggable-handle flex justify-center items-center cursor-pointer">
@@ -25,10 +36,10 @@
 
             <div class="simple-repeatable-fields-wrapper w-full flex">
               <component
-                v-for="(repField, j) in fields"
+                v-for="(rowField, j) in row"
                 :key="j"
-                :is="`form-${repField.component}`"
-                :field="repField"
+                :is="`form-${rowField.component}`"
+                :field="rowField"
                 :errors="repeatableErrors[i]"
                 class="mr-3"
               />
@@ -37,7 +48,7 @@
             <div
               class="delete-icon flex justify-center items-center cursor-pointer"
               @click="deleteRow(i)"
-              v-if="field.canDeleteRows"
+              v-if="canDeleteRows"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="fill-current">
                 <path
@@ -52,7 +63,7 @@
           v-if="canAddRows"
           @click="addRow"
           class="add-button btn btn-default btn-primary mt-3"
-          :class="{ 'delete-width': field.canDeleteRows }"
+          :class="{ 'delete-width': canDeleteRows }"
           type="button"
         >
           {{ __('simpleRepeatable.addRow') }}
@@ -66,11 +77,12 @@
 import Draggable from 'vuedraggable';
 import { Errors } from 'form-backend-validation';
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
+import NovaTranslatableSupport from '../mixins/NovaTranslatableSupport';
 
 let UNIQUE_ID_INDEX = 0;
 
 export default {
-  mixins: [FormField, HandlesValidationErrors],
+  mixins: [FormField, HandlesValidationErrors, NovaTranslatableSupport],
 
   components: { Draggable },
 
@@ -78,48 +90,43 @@ export default {
 
   data() {
     return {
-      fieldsWithValues: [],
+      rows: [],
     };
   },
 
   methods: {
     setInitialValue() {
-      let value = [];
-      try {
-        if (!this.field.value) {
-          value = [];
-        } else if (typeof this.field.value === 'string') {
-          value = JSON.parse(this.field.value) || [];
-        } else if (Array.isArray(this.field.value)) {
-          value = this.field.value;
-        }
-      } catch (e) {
-        value = [];
-      }
+      this.rows = this.field.rows.map(row => this.copyFields(row.fields));
 
-      this.fieldsWithValues = value.map(this.copyFields);
+      // Initialize minimum amount of rows
+      if (this.field.minRows && !isNaN(this.field.minRows)) {
+        while (this.rows.length < this.field.minRows) this.addRow();
+      }
     },
 
-    copyFields(value) {
-      return this.field.repeatableFields.map(field => ({
+    copyFields(fields) {
+      // Return an array of fields with unique attribute
+      return fields.map(field => ({
         ...field,
         attribute: `${field.attribute}---${UNIQUE_ID_INDEX++}`,
-        value: value && value[field.attribute],
+        value: field.value,
       }));
     },
 
     fill(formData) {
       const allValues = [];
 
-      for (const fields of this.fieldsWithValues) {
+      for (const row of this.rows) {
+        let formData = new FormData();
         const rowValues = {};
 
-        for (const field of fields) {
-          const formData = new FormData();
-          field.fill(formData);
+        // Fill formData with field values
+        row.forEach(field => field.fill(formData));
 
-          const normalizedAttribute = field.attribute.replace(/---\d+/, '');
-          rowValues[normalizedAttribute] = formData.get(field.attribute);
+        // Save field values to rowValues
+        for (const item of formData) {
+          const normalizedAttribute = item[0].replace(/---\d+/, '');
+          rowValues[normalizedAttribute] = item[1];
         }
 
         allValues.push(rowValues);
@@ -129,11 +136,11 @@ export default {
     },
 
     addRow() {
-      this.fieldsWithValues.push(this.copyFields());
+      this.rows.push(this.copyFields(this.field.fields));
     },
 
     deleteRow(index) {
-      this.fieldsWithValues.splice(index, 1);
+      this.rows.splice(index, 1);
     },
   },
 
@@ -166,7 +173,13 @@ export default {
 
     canAddRows() {
       if (!this.field.canAddRows) return false;
-      if (!!this.field.maxRows) return this.fieldsWithValues.length < this.field.maxRows;
+      if (!!this.field.maxRows) return this.rows.length < this.field.maxRows;
+      return true;
+    },
+
+    canDeleteRows() {
+      if (!this.field.canDeleteRows) return false;
+      if (!!this.field.minRows) return this.rows.length > this.field.minRows;
       return true;
     },
   },
@@ -183,10 +196,12 @@ export default {
     width: calc(100% + 68px);
 
     > .simple-repeatable-fields-wrapper {
-      > * {
+      > *,
+        // Improve compatibility with nova-translatable
+      .translatable-field:nth-child(2) div {
         flex: 1;
         flex-shrink: 0;
-        min-width: 0px;
+        min-width: 0;
         border: none !important;
 
         // Hide name

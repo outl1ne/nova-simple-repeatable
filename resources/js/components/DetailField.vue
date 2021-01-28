@@ -27,8 +27,6 @@ export default {
 
   computed: {
     values() {
-      const headers = this.headers;
-
       let value = this.field.value;
       if (!value) return void 0;
 
@@ -45,14 +43,14 @@ export default {
     },
 
     headers() {
-      const fields = this.field.repeatableFields;
-      return fields.map(field => ({ name: field.name, attribute: field.attribute }));
+      const rows = this.field.rows;
+      return rows[0].fields.map(field => ({ name: field.name, attribute: field.attribute }));
     },
   },
 
   methods: {
     handleValue(valuesArray) {
-      const fields = this.field.repeatableFields;
+      const fields = this.field.fields;
 
       const fieldsWithOptions = fields.filter(field => Array.isArray(field.options) && !!field.options.length);
       if (fieldsWithOptions.length > 0) {

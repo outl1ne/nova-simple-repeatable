@@ -2,10 +2,11 @@
 
 namespace OptimistDigital\NovaSimpleRepeatable;
 
-use Laravel\Nova\Fields\Field;
-use Laravel\Nova\PerformsValidation;
 use Illuminate\Support\Facades\Validator;
+use Laravel\Nova\Fields\Field;
+use Laravel\Nova\Fields\FieldCollection;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\PerformsValidation;
 
 class SimpleRepeatable extends Field
 {
@@ -14,6 +15,7 @@ class SimpleRepeatable extends Field
     public $component = 'simple-repeatable';
 
     protected $fields = [];
+    protected $rows = [];
 
     public function __construct($name, $attribute = null, $fields = [])
     {
@@ -25,15 +27,14 @@ class SimpleRepeatable extends Field
         $this->hideFromIndex();
     }
 
-    public function canAddRows($canAddRows = true)
-    {
-        return $this->withMeta(['canAddRows' => $canAddRows]);
-    }
-
     public function fields($fields = [])
     {
-        $this->fields = $fields;
-        return $this->withMeta(['repeatableFields' => $fields]);
+        $this->fields = FieldCollection::make($fields);
+    }
+
+    public function minRows($minRows = null)
+    {
+        return $this->withMeta(['minRows' => $minRows]);
     }
 
     public function maxRows($maxRows = null)
@@ -41,11 +42,25 @@ class SimpleRepeatable extends Field
         return $this->withMeta(['maxRows' => $maxRows]);
     }
 
+    public function canAddRows($canAddRows = true)
+    {
+        return $this->withMeta(['canAddRows' => $canAddRows]);
+    }
+
     public function canDeleteRows($canDeleteRows = true)
     {
         return $this->withMeta(['canDeleteRows' => $canDeleteRows]);
     }
 
+    /**
+     *
+     * Validate and hydrate the given attribute on the model based on the incoming request.
+     *
+     * @param NovaRequest $request
+     * @param $requestAttribute
+     * @param $model
+     * @param $attribute
+     */
     protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         $value = $request->input($requestAttribute) ?? null;
@@ -65,5 +80,69 @@ class SimpleRepeatable extends Field
         Validator::make([$this->attribute => $value], $rules)->validate();
 
         $model->{$attribute} = $value;
+    }
+
+    /**
+     * Resolve the field's and it's rows value.
+     *
+     * @param mixed $resource
+     * @param string|null $attribute
+     * @return void
+     */
+    public function resolve($resource, $attribute = null)
+    {
+        $attribute = $attribute ?? $this->attribute;
+        $this->rows = $this->buildRows($resource, $attribute);
+
+        // Resolve rows
+        $this->rows->each->resolve();
+
+        $this->withMeta([
+            'rows' => $this->rows,
+            'fields' => $this->fields->resolve(null) // Empty fields
+        ]);
+
+        parent::resolve($resource, $attribute);
+    }
+
+    /**
+     * Define the field's actual rows (as "base models") based
+     * on the field's current model & attribute
+     *
+     * @param mixed $resource
+     * @param string $attribute
+     * @return Illuminate\Support\Collection
+     */
+    public function buildRows($resource, $attribute)
+    {
+        $value = $this->extractValueFromResource($resource, $attribute);
+        return collect($value)->map(function ($item) {
+            return (new Row($this->fields))->duplicateAndHydrate((array)$item);
+        })->filter()->values();
+    }
+
+    /**
+     * Find the attribute's value in the given resource
+     *
+     * @param mixed $resource
+     * @param string $attribute
+     * @return array
+     */
+    protected function extractValueFromResource($resource, $attribute)
+    {
+        $value = data_get($resource, str_replace('->', '.', $attribute)) ?? [];
+
+        if ($value instanceof Collection) {
+            $value = $value->toArray();
+        } else if (is_string($value)) {
+            $value = json_decode($value) ?? [];
+        }
+
+        // Fail silently in case data is invalid
+        if (!is_array($value)) return [];
+
+        return array_map(function ($item) {
+            return is_array($item) ? (object)$item : $item;
+        }, $value);
     }
 }
