@@ -29,14 +29,14 @@ class SimpleRepeatable extends Field
         $this->hideFromIndex();
     }
 
-    public function canAddRows($canAddRows = true)
-    {
-        return $this->withMeta(['canAddRows' => $canAddRows]);
-    }
-
     public function fields($fields = [])
     {
         $this->fields = FieldCollection::make($fields);
+    }
+
+    public function minRows($minRows = null)
+    {
+        return $this->withMeta(['minRows' => $minRows]);
     }
 
     public function maxRows($maxRows = null)
@@ -44,11 +44,25 @@ class SimpleRepeatable extends Field
         return $this->withMeta(['maxRows' => $maxRows]);
     }
 
+    public function canAddRows($canAddRows = true)
+    {
+        return $this->withMeta(['canAddRows' => $canAddRows]);
+    }
+
     public function canDeleteRows($canDeleteRows = true)
     {
         return $this->withMeta(['canDeleteRows' => $canDeleteRows]);
     }
 
+    /**
+     *
+     * Validate and hydrate the given attribute on the model based on the incoming request.
+     *
+     * @param NovaRequest $request
+     * @param $requestAttribute
+     * @param $model
+     * @param $attribute
+     */
     protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         $value = $request->input($requestAttribute) ?? null;
@@ -70,6 +84,13 @@ class SimpleRepeatable extends Field
         $model->{$attribute} = $value;
     }
 
+    /**
+     * Resolve the field's and it's rows value.
+     *
+     * @param mixed $resource
+     * @param string|null $attribute
+     * @return void
+     */
     public function resolve($resource, $attribute = null)
     {
         $attribute = $attribute ?? $this->attribute;
@@ -86,6 +107,14 @@ class SimpleRepeatable extends Field
         parent::resolve($resource, $attribute);
     }
 
+    /**
+     * Define the field's actual rows (as "base models") based
+     * on the field's current model & attribute
+     *
+     * @param mixed $resource
+     * @param string $attribute
+     * @return Illuminate\Support\Collection
+     */
     public function buildRows($resource, $attribute)
     {
         $value = $this->extractValueFromResource($resource, $attribute);
@@ -94,6 +123,13 @@ class SimpleRepeatable extends Field
         })->filter()->values();
     }
 
+    /**
+     * Find the attribute's value in the given resource
+     *
+     * @param mixed $resource
+     * @param string $attribute
+     * @return array
+     */
     protected function extractValueFromResource($resource, $attribute)
     {
         $value = data_get($resource, str_replace('->', '.', $attribute)) ?? [];
