@@ -2,7 +2,6 @@
 
 namespace OptimistDigital\NovaSimpleRepeatable;
 
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Fields\FieldCollection;
