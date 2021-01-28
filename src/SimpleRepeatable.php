@@ -18,11 +18,10 @@ class SimpleRepeatable extends Field
     protected $fields = [];
     protected $rows = [];
 
-    public function __construct($name, $attribute = null, $fields = [], $attributes = [])
+    public function __construct($name, $attribute = null, $fields = [])
     {
         parent::__construct($name, $attribute, null);
 
-        $this->attributes = $attributes;
         $this->fields($fields);
         $this->canAddRows(true);
         $this->canDeleteRows(true);
