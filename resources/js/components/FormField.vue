@@ -4,7 +4,7 @@
       <div class="flex flex-col">
         <!-- Title columns -->
         <div class="simple-repeatable-header-row flex border-b border-40 py-2">
-          <div v-for="(rowField, i) in rows[0]" :key="i" class="font-bold text-90 text-md w-full mr-3 flex">
+          <div v-for="(rowField, i) in rows[0]" :key="i" class="font-bold text-90 text-md w-full ml-3 flex">
             {{ rowField.name }}
 
             <!--  If field is nova-translatable, render seperate locale-tabs   -->
@@ -198,7 +198,7 @@ export default {
     > .simple-repeatable-fields-wrapper {
       > *,
         // Improve compatibility with nova-translatable
-      .translatable-field:nth-child(2) div {
+      .translatable-field > div:nth-child(2) div {
         flex: 1;
         flex-shrink: 0;
         min-width: 0;
