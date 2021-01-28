@@ -24,9 +24,7 @@
 <script>
 export default {
   props: ['resource', 'resourceName', 'resourceId', 'field'],
-  mounted() {
-    console.log(this.values);
-  },
+
   computed: {
     values() {
       let value = this.field.value;

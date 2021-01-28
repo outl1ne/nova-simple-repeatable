@@ -4,16 +4,16 @@
       <div class="flex flex-col">
         <!-- Title columns -->
         <div class="simple-repeatable-header-row flex border-b border-40 py-2">
-          <div v-for="(repField, i) in rows[0]" :key="i" class="font-bold text-90 text-md w-full mr-3 flex">
-            {{ repField.name }}
+          <div v-for="(rowField, i) in rows[0]" :key="i" class="font-bold text-90 text-md w-full mr-3 flex">
+            {{ rowField.name }}
 
             <!--  If field is nova-translatable, render seperate locale-tabs   -->
             <nova-translatable-locale-tabs
               style="padding: 0"
               class="ml-auto"
-              v-if="repField.component === 'translatable-field'"
-              :locales="getFieldLocales(repField.translatable.locales)"
-              :active-locale="activeLocale || getFieldLocales(repField.translatable.locales)[0].key"
+              v-if="rowField.component === 'translatable-field'"
+              :locales="getFieldLocales(rowField.translatable.locales)"
+              :active-locale="activeLocale || getFieldLocales(rowField.translatable.locales)[0].key"
               @tabClick="setAllLocales"
               @dblclick="setAllLocales"
             />
@@ -36,10 +36,10 @@
 
             <div class="simple-repeatable-fields-wrapper w-full flex">
               <component
-                v-for="(repField, j) in row"
+                v-for="(rowField, j) in row"
                 :key="j"
-                :is="`form-${repField.component}`"
-                :field="repField"
+                :is="`form-${rowField.component}`"
+                :field="rowField"
                 :errors="repeatableErrors[i]"
                 class="mr-3"
               />
@@ -48,7 +48,7 @@
             <div
               class="delete-icon flex justify-center items-center cursor-pointer"
               @click="deleteRow(i)"
-              v-if="field.canDeleteRows"
+              v-if="canDeleteRows"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" class="fill-current">
                 <path
@@ -63,7 +63,7 @@
           v-if="canAddRows"
           @click="addRow"
           class="add-button btn btn-default btn-primary mt-3"
-          :class="{ 'delete-width': field.canDeleteRows }"
+          :class="{ 'delete-width': canDeleteRows }"
           type="button"
         >
           {{ __('simpleRepeatable.addRow') }}
@@ -97,9 +97,15 @@ export default {
   methods: {
     setInitialValue() {
       this.rows = this.field.rows.map(row => this.copyFields(row.fields));
+
+      // Initialize minimum amount of rows
+      if (this.field.minRows && !isNaN(this.field.minRows)) {
+        while (this.rows.length < this.field.minRows) this.addRow();
+      }
     },
 
     copyFields(fields) {
+      // Return an array of fields with unique attribute
       return fields.map(field => ({
         ...field,
         attribute: `${field.attribute}---${UNIQUE_ID_INDEX++}`,
@@ -111,10 +117,13 @@ export default {
       const allValues = [];
 
       for (const row of this.rows) {
-        const rowValues = {};
         let formData = new FormData();
+        const rowValues = {};
+
+        // Fill formData with field values
         row.forEach(field => field.fill(formData));
 
+        // Save field values to rowValues
         for (const item of formData) {
           const normalizedAttribute = item[0].replace(/---\d+/, '');
           rowValues[normalizedAttribute] = item[1];
@@ -165,6 +174,12 @@ export default {
     canAddRows() {
       if (!this.field.canAddRows) return false;
       if (!!this.field.maxRows) return this.rows.length < this.field.maxRows;
+      return true;
+    },
+
+    canDeleteRows() {
+      if (!this.field.canDeleteRows) return false;
+      if (!!this.field.minRows) return this.rows.length > this.field.minRows;
       return true;
     },
   },
