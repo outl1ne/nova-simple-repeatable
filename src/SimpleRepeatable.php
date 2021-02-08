@@ -130,7 +130,14 @@ class SimpleRepeatable extends Field
      */
     protected function extractValueFromResource($resource, $attribute)
     {
-        $value = data_get($resource, str_replace('->', '.', $attribute)) ?? [];
+        if (is_callable($this->resolveCallback)) {
+            $origValue = $this->resolveAttribute($resource, $attribute);
+            $value = call_user_func($this->resolveCallback, $origValue, $resource, $attribute);
+        } else {
+            $value = data_get($resource, str_replace('->', '.', $attribute)) ?? [];
+        }
+
+
 
         if ($value instanceof Collection) {
             $value = $value->toArray();
