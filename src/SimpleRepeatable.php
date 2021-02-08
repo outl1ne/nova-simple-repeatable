@@ -135,7 +135,7 @@ class SimpleRepeatable extends Field
         if ($value instanceof Collection) {
             $value = $value->toArray();
         } else if (is_string($value)) {
-            $value = json_decode($value) ?? [];
+            $value = json_decode($value, true) ?? [];
         }
 
         // Fail silently in case data is invalid
