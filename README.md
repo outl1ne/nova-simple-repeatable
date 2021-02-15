@@ -42,6 +42,16 @@ public function fields(Request $request) {
 }
 ```
 
+## Localization
+
+The translations file can be published by using the following publish command:
+
+```bash
+php artisan vendor:publish --provider="OptimistDigital\NovaSimpleRepeatable\SimpleRepeatableServiceProvider" --tag="translations"
+```
+
+You can then edit the strings to your liking.
+
 ## Credits
 
 - [Tarvo Reinpalu](https://github.com/tarpsvo)
