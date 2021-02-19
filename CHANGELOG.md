@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Published translations for faster localization (thanks to [@eimantaaas](https://github.com/eimantaaas))
-- Hide table header for hidden fields (thanks to [@eimantaaas](https://github.com/eimantaaas))
+- Hide table header for hidden fields (thanks to [@thefilip](https://github.com/thefilip))
 - Updated packages
 
 ## [1.2.3] - 2021-02-08
