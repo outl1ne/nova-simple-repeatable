@@ -4,7 +4,7 @@
       <div class="flex flex-col">
         <!-- Title columns -->
         <div class="simple-repeatable-header-row flex border-b border-40 py-2">
-          <div v-for="(rowField, i) in rows[0]" :key="i" class="font-bold text-90 text-md w-full ml-3 flex">
+          <div v-for="(rowField, i) in fields" :key="i" class="font-bold text-90 text-md w-full ml-3 flex">
             {{ rowField.name }}
 
             <!--  If field is nova-translatable, render seperate locale-tabs   -->
@@ -145,6 +145,10 @@ export default {
   },
 
   computed: {
+    fields() {
+        return _(this.rows[0]).filter(field => field.component !== 'hidden-field')
+    },
+
     repeatableErrors() {
       const errorKeys = Object.keys(this.errors.errors).filter(key => key.startsWith(this.field.attribute));
       const uniqueErrorKeyMatches = [];
