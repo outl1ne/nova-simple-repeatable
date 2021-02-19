@@ -17,7 +17,7 @@ class SimpleRepeatableServiceProvider extends ServiceProvider
             Nova::script('simple-repeatable', __DIR__ . '/../dist/js/field.js');
         });
 
-        $this->loadTranslations(__DIR__ . '/../resources/lang', 'nova-simple-repeatable-field');
+        $this->loadTranslations(__DIR__ . '/../resources/lang', 'nova-simple-repeatable-field', true);
     }
 
     public function register()
