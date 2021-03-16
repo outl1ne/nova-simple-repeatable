@@ -146,7 +146,7 @@ export default {
 
   computed: {
     fields() {
-        return _(this.rows[0]).filter(field => field.component !== 'hidden-field')
+      return (this.rows[0] ?? []).filter(field => field.component !== 'hidden-field');
     },
 
     repeatableErrors() {
