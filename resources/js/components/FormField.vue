@@ -3,7 +3,7 @@
     <template slot="field">
       <div class="flex flex-col">
         <!-- Title columns -->
-        <div class="simple-repeatable-header-row flex border-b border-40 py-2">
+        <div v-if="rowField.length" class="simple-repeatable-header-row flex border-b border-40 py-2">
           <div v-for="(rowField, i) in fields" :key="i" class="font-bold text-90 text-md w-full ml-3 flex">
             {{ rowField.name }}
 
