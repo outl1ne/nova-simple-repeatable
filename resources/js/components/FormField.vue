@@ -153,8 +153,11 @@ export default {
       const errorKeys = Object.keys(this.errors.errors).filter(key => key.startsWith(this.field.attribute));
       const uniqueErrorKeyMatches = [];
       errorKeys.forEach(key => {
-        const match = key.match(/.+.(\d.)/)[0];
-        if (!uniqueErrorKeyMatches.find(key => key.startsWith(match))) uniqueErrorKeyMatches.push(match);
+        const rgx = key.match(/.+.(\d.)/);
+        const match = rgx && rgx[0];
+        if (match && !uniqueErrorKeyMatches.find(key => key.startsWith(match))) {
+          uniqueErrorKeyMatches.push(match);
+        }
       });
 
       const errors = {};
