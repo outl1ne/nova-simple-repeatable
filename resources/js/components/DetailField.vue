@@ -1,5 +1,5 @@
 <template>
-  <panel-item :field="field">
+  <panel-item :field="field" class="simple-repeatable">
     <template slot="value">
       <div class="overflow-hidden relative rounded-lg bg-white shadow border border-60" v-if="values && values.length">
         <table class="table w-full table-default nova-resource-table">
@@ -9,8 +9,15 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, i) of values" :key="i" class="nova-resource-table-row">
-              <td class="font-mono text-sm" style="height: 2rem" v-for="(value, i) in row" :key="i">{{ value }}</td>
+            <tr v-for="(row, i) of field.rows" :key="i" class="nova-resource-table-row">
+              <td
+                class="font-mono text-sm simple-repeatable-detail-field-wrapper"
+                style="height: 2rem"
+                v-for="(rowField, j) in row.fields"
+                :key="j"
+              >
+                <component :key="j" :is="`detail-${rowField.component}`" :field="rowField" class="mr-3" />
+              </td>
             </tr>
           </tbody>
         </table>
@@ -96,3 +103,45 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.simple-repeatable {
+  .simple-repeatable-detail-field-wrapper {
+    > *,
+        // Improve compatibility with nova-translatable
+      .translatable-field > div:not(:first-child) div {
+      flex: 1;
+      flex-shrink: 0;
+      min-width: 0;
+      border: none !important;
+
+      // Hide name
+      > *:nth-child(1):not(:only-child) {
+        display: none;
+      }
+
+      > *:only-child {
+        > *:nth-child(1):not(:only-child) {
+          display: none;
+        }
+
+        > :nth-child(2) {
+          width: 100% !important;
+          padding: 0 !important;
+        }
+      }
+
+      // Improve compatibility with nova-compact-theme
+      .compact-nova-field-wrapper {
+        padding: 0 !important;
+      }
+
+      // Fix field width and padding
+      > :nth-child(2) {
+        width: 100% !important;
+        padding: 0 !important;
+      }
+    }
+  }
+}
+</style>
