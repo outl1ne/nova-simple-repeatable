@@ -55,7 +55,6 @@ export default {
       const fieldsWithOptions = fields.filter(field => Array.isArray(field.options) && !!field.options.length);
       if (fieldsWithOptions.length > 0) {
         fieldsWithOptions.forEach(field => {
-          const attribute = field.attribute;
           valuesArray = valuesArray.map(entry => {
             const id = entry[field.attribute];
 
