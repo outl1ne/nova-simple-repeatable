@@ -126,7 +126,7 @@ export default {
         // Save field values to rowValues
         for (const item of formData) {
           const normalizedAttribute = item[0].replace(/---\d+/, '');
-          rowValues[normalizedAttribute] = item[1];
+          rowValues[normalizedAttribute] = JSON.parse(item[1]);
         }
 
         allValues.push(rowValues);
