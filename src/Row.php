@@ -25,7 +25,7 @@ class Row implements JsonSerializable
      */
     public function duplicateAndHydrate(array $attributes = [])
     {
-        return new static ($this->fields->map(function ($field) {
+        return new static($this->fields->map(function ($field) {
             return $this->cloneField($field);
         }), $attributes);
     }
@@ -38,6 +38,11 @@ class Row implements JsonSerializable
     public function resolve()
     {
         $this->fields->each->resolve($this->attributes);
+    }
+
+    public function resolveForDisplay()
+    {
+        $this->fields->each->resolveForDisplay($this->attributes);
     }
 
     /**

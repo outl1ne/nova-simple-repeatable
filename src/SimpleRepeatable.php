@@ -92,18 +92,25 @@ class SimpleRepeatable extends Field
      */
     public function resolve($resource, $attribute = null)
     {
+        $novaRequest = app()->make(NovaRequest::class);
+        $resolveForDisplay = $novaRequest->isResourceIndexRequest() || $novaRequest->isResourceDetailRequest();
+
         $attribute = $attribute ?? $this->attribute;
         $this->rows = $this->buildRows($resource, $attribute);
 
         // Resolve rows
-        $this->rows->each->resolve();
+        if ($resolveForDisplay) {
+            $this->rows->each->resolveForDisplay();
+        } else {
+            $this->rows->each->resolve();
+        }
 
         $this->withMeta([
             'rows' => $this->rows,
             'fields' => $this->fields->resolve(null) // Empty fields
         ]);
 
-        parent::resolve($resource, $attribute);
+        return parent::resolve($resource, $attribute);
     }
 
     /**
