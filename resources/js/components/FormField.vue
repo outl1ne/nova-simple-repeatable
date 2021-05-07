@@ -114,6 +114,7 @@ export default {
     },
 
     fill(formData) {
+      const ARR_REGEX = () => /\[\d+\]$/g;
       const allValues = [];
 
       for (const row of this.rows) {
@@ -126,7 +127,14 @@ export default {
         // Save field values to rowValues
         for (const item of formData) {
           let normalizedValue = null;
-          const normalizedAttribute = item[0].replace(/---\d+/, '');
+          let key = item[0].replace(/---\d+/, '');
+
+          // Is key is an array, we need to remove the '.en' part from '.en[0]'
+          const isArray = !!key.match(ARR_REGEX());
+          if (isArray) {
+            const result = ARR_REGEX().exec(key);
+            key = `${key.slice(0, result.index)}${key.slice(result.index + result[0].length)}`;
+          }
 
           try {
             // Attempt to parse value
@@ -136,7 +144,12 @@ export default {
             normalizedValue = item[1];
           }
 
-          rowValues[normalizedAttribute] = normalizedValue;
+          if (isArray) {
+            if (!rowValues[key]) rowValues[key] = [];
+            rowValues[key].push(normalizedValue);
+          } else {
+            rowValues[key] = normalizedValue;
+          }
         }
 
         allValues.push(rowValues);
