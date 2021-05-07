@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hide header row with titles when there's no rows added yet
 - Fix underlying fields that are supposed to return an array or an object returning a string instead
 - Fixed issue with validation crashing in some cases
+- Fixed fields returning `formData[i]` arrays not being saved
+- Render detail fields on detail view (let's see how well this goes, might rollback later)
 - Updated packages
 
 ## [1.2.5] - 2021-03-16
