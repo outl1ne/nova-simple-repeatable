@@ -44,7 +44,7 @@ export default {
 
     headers() {
       const rows = this.field.rows;
-      return rows[0].fields.map(field => ({ name: field.name, attribute: field.attribute }));
+      return rows && rows[0] && rows[0].fields.map(field => ({ name: field.name, attribute: field.attribute }));
     },
   },
 
