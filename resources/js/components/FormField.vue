@@ -125,8 +125,18 @@ export default {
 
         // Save field values to rowValues
         for (const item of formData) {
+          let normalizedValue = null;
           const normalizedAttribute = item[0].replace(/---\d+/, '');
-          rowValues[normalizedAttribute] = item[1];
+
+          try {
+            // Attempt to parse value
+            normalizedValue = JSON.parse(item[1]);
+          } catch (e) {
+            // Value is already a valid string
+            normalizedValue = item[1];
+          }
+
+          rowValues[normalizedAttribute] = normalizedValue;
         }
 
         allValues.push(rowValues);
