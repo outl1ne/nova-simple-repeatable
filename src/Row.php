@@ -11,9 +11,9 @@ class Row implements JsonSerializable
     protected $fields;
     protected $attributes;
 
-    public function __construct($fields = null, $attributes = [])
+    public function __construct(FieldCollection $fields, $attributes = [])
     {
-        $this->fields = new FieldCollection($fields);
+        $this->fields = $fields;
         $this->attributes = $attributes;
     }
 
@@ -23,10 +23,11 @@ class Row implements JsonSerializable
      * @param array $attributes
      * @return Row
      */
-    public function duplicateAndHydrate(array $attributes = [])
+    public static function make(FieldCollection $fields, array $attributes = [])
     {
-        return new static($this->fields->map(function ($field) {
-            return $this->cloneField($field);
+        $newFields = clone $fields;
+        return new static($newFields->map(function ($field) {
+            return static::cloneField($field);
         }), $attributes);
     }
 
@@ -51,10 +52,9 @@ class Row implements JsonSerializable
      * @param \Laravel\Nova\Fields\Field $original
      * @return \Laravel\Nova\Fields\Field
      */
-    protected function cloneField(Field $original)
+    protected static function cloneField(Field $original)
     {
         $field = clone $original;
-
         $callables = ['displayCallback', 'resolveCallback', 'fillCallback', 'requiredCallback'];
 
         foreach ($callables as $callable) {

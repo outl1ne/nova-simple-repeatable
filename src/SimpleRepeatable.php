@@ -124,8 +124,8 @@ class SimpleRepeatable extends Field
     public function buildRows($resource, $attribute)
     {
         $value = $this->extractValueFromResource($resource, $attribute);
-        return collect($value)->map(function ($item) {
-            return (new Row($this->fields))->duplicateAndHydrate((array)$item);
+        return collect($value)->map(function ($rowValue) {
+            return Row::make($this->fields, (array) $rowValue);
         })->filter()->values();
     }
 
