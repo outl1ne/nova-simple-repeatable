@@ -14,6 +14,7 @@
               v-if="rowField.component === 'translatable-field'"
               :locales="getFieldLocales(rowField.translatable.locales)"
               :active-locale="activeLocale || getFieldLocales(rowField.translatable.locales)[0].key"
+              :locales-with-errors="repeatableValidation.locales[rowField.originalAttribute]"
               @tabClick="setAllLocales"
               @dblclick="setAllLocales"
             />
@@ -40,7 +41,7 @@
                 :key="j"
                 :is="`form-${rowField.component}`"
                 :field="rowField"
-                :errors="repeatableErrors[i]"
+                :errors="repeatableValidation.errors"
                 class="mr-3"
               />
             </div>
@@ -79,8 +80,6 @@ import { Errors } from 'form-backend-validation';
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
 import NovaTranslatableSupport from '../mixins/NovaTranslatableSupport';
 
-let UNIQUE_ID_INDEX = 0;
-
 export default {
   mixins: [FormField, HandlesValidationErrors, NovaTranslatableSupport],
 
@@ -96,7 +95,7 @@ export default {
 
   methods: {
     setInitialValue() {
-      this.rows = this.field.rows.map(row => this.copyFields(row.fields));
+      this.rows = this.field.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex));
 
       // Initialize minimum amount of rows
       if (this.field.minRows && !isNaN(this.field.minRows)) {
@@ -104,13 +103,20 @@ export default {
       }
     },
 
-    copyFields(fields) {
+    copyFields(fields, rowIndex = void 0) {
+      if (!rowIndex) rowIndex = this.rows.length;
+
       // Return an array of fields with unique attribute
-      return fields.map(field => ({
-        ...field,
-        attribute: `${field.attribute}---${UNIQUE_ID_INDEX++}`,
-        value: field.value,
-      }));
+      return fields.map(field => {
+        const uniqueAttribute = `${this.field.attribute}---${field.attribute}---${rowIndex}`;
+
+        return {
+          ...field,
+          originalAttribute: field.attribute,
+          validationKey: uniqueAttribute,
+          attribute: uniqueAttribute,
+        };
+      });
     },
 
     fill(formData) {
@@ -127,7 +133,12 @@ export default {
         // Save field values to rowValues
         for (const item of formData) {
           let normalizedValue = null;
-          let key = item[0].replace(/---\d+/, '');
+
+          let key = item[0];
+          if (key.split('---').length === 3) {
+            key = key.split('---').slice(1).join('---');
+          }
+          key = key.replace(/---\d+/, '');
 
           // Is key is an array, we need to remove the '.en' part from '.en[0]'
           const isArray = !!key.match(ARR_REGEX());
@@ -159,7 +170,7 @@ export default {
     },
 
     addRow() {
-      this.rows.push(this.copyFields(this.field.fields));
+      this.rows.push(this.copyFields(this.field.fields, this.rows.length));
     },
 
     deleteRow(index) {
@@ -172,33 +183,47 @@ export default {
       return (this.rows[0] ?? []).filter(field => field.component !== 'hidden-field');
     },
 
-    repeatableErrors() {
-      const errorKeys = Object.keys(this.errors.errors).filter(key => key.startsWith(this.field.attribute));
-      const uniqueErrorKeyMatches = [];
-      errorKeys.forEach(key => {
-        const rgx = key.match(/.+.(\d.)/);
-        const match = rgx && rgx[0];
-        if (match && !uniqueErrorKeyMatches.find(key => key.startsWith(match))) {
-          uniqueErrorKeyMatches.push(match);
+    repeatableValidation() {
+      const fields = this.fields;
+      const errors = this.errors.errors;
+      const repeaterAttr = this.field.attribute;
+      const safeRepeaterAttr = this.field.attribute.replace(/.{16}__/, '');
+      const erroredFieldLocales = {};
+      const formattedKeyErrors = {};
+
+      // Find errored locales
+      for (const field of fields) {
+        const fieldAttr = field.originalAttribute;
+
+        // Find all errors related to this field
+        const relatedErrors = Object.keys(errors).filter(
+          err => !!err.match(new RegExp(`^${safeRepeaterAttr}.\\d+.${fieldAttr}`))
+        );
+
+        const isTranslatable = field.component === 'translatable-field';
+        if (isTranslatable) {
+          const foundLocales = relatedErrors.map(errorKey => errorKey.split('.').slice(-1)).flat();
+          erroredFieldLocales[fieldAttr] = foundLocales;
         }
-      });
 
-      const errors = {};
-      uniqueErrorKeyMatches.forEach(keyMatch => {
-        const keyWithoutPrefix = keyMatch.slice(this.field.attribute.length + 1);
-        const fieldIndex = keyWithoutPrefix.match(/(\d)./)[1];
+        // Format field
+        relatedErrors.forEach(errorKey => {
+          const rowIndex = errorKey.split('.')[1];
+          let uniqueKey = `${repeaterAttr}---${field.originalAttribute}---${rowIndex}`;
 
-        const errorKeysForThisIndex = errorKeys.filter(key => key.startsWith(keyMatch));
+          if (isTranslatable) {
+            const locale = errorKey.split('.').slice(-1)[0];
+            uniqueKey = `${uniqueKey}.${locale}`;
+          }
 
-        const errorsForThisIndex = {};
-        errorKeysForThisIndex.forEach(errorKey => {
-          const fieldName = errorKey.slice(keyMatch.length);
-          errorsForThisIndex[fieldName] = this.errors.errors[errorKey];
+          formattedKeyErrors[uniqueKey] = errors[errorKey];
         });
-        errors[fieldIndex] = new Errors(errorsForThisIndex);
-      });
+      }
 
-      return errors;
+      return {
+        errors: new Errors(formattedKeyErrors),
+        locales: erroredFieldLocales,
+      };
     },
 
     canAddRows() {
