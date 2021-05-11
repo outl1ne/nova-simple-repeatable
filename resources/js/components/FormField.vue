@@ -253,7 +253,7 @@ export default {
     > .simple-repeatable-fields-wrapper {
       > *,
         // Improve compatibility with nova-translatable
-      .translatable-field > div:not(:first-child) div {
+      .translatable-field > div:not(:first-child) > div {
         flex: 1;
         flex-shrink: 0;
         min-width: 0;
