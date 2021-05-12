@@ -2,12 +2,15 @@
 
 namespace OptimistDigital\NovaSimpleRepeatable;
 
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
+use Exception;
+use Laravel\Nova\Nova;
 use Laravel\Nova\Fields\Field;
-use Laravel\Nova\Fields\FieldCollection;
-use Laravel\Nova\Http\Requests\NovaRequest;
+use Illuminate\Support\Collection;
 use Laravel\Nova\PerformsValidation;
+use Laravel\Nova\Fields\FieldCollection;
+use Illuminate\Support\Facades\Validator;
+use Laravel\Nova\Http\Requests\NovaRequest;
+use ReflectionMethod;
 
 class SimpleRepeatable extends Field
 {
@@ -78,6 +81,18 @@ class SimpleRepeatable extends Field
                 return ["{$this->attribute}.*.$key" => $value];
             })->all()
         );
+
+        if ($this->resource) {
+            try {
+                $resource = Nova::resourceForModel($this->resource);
+                $formatRules = new ReflectionMethod($resource, 'formatRules');
+                $formatRules->setAccessible(true);
+                $newRules = $formatRules->invoke(new $resource($this->resource), $request, $rules);
+                if ($newRules) $rules = $newRules;
+            } catch (Exception $e) {
+            }
+        }
+
         Validator::make([$this->attribute => $value], $rules)->validate();
 
         $model->{$attribute} = $value;
