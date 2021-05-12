@@ -11,7 +11,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^7.26.0",
     "laravel-mix": "^6.0.19",
-    "laravel-nova": "^1.11.1",
+    "laravel-nova": "^1.12.3",
     "postcss": "^8.2.15",
     "prettier": "^2.3.0",
     "resolve-url-loader": "^4.0.0",
