@@ -71,6 +71,29 @@ class SimpleRepeatable extends Field
         $value = json_decode($value, true);
 
         // Do validation
+        $rules = $this->getFormattedRules($request);
+        Validator::make([$this->attribute => $value], $rules)->validate();
+
+        $model->{$attribute} = $value;
+    }
+
+    public function fill(NovaRequest $request, $model)
+    {
+        if (get_class($model) === 'Whitecube\NovaFlexibleContent\Layouts\Layout') {
+            $value = $request->input($this->attribute) ?? null;
+            $value = json_decode($value, true);
+
+            // Do validation
+            $this->resource = $request->findModelOrFail();
+            $rules = $this->getFormattedRules($request);
+            Validator::make([$this->attribute => $value], $rules)->validate();
+        }
+
+        parent::fill($request, $model);
+    }
+
+    protected function getFormattedRules(NovaRequest $request)
+    {
         $rules = static::formatRules(
             $request,
             collect($this->fields)->reject(function ($field) use ($request) {
@@ -93,9 +116,7 @@ class SimpleRepeatable extends Field
             }
         }
 
-        Validator::make([$this->attribute => $value], $rules)->validate();
-
-        $model->{$attribute} = $value;
+        return $rules;
     }
 
     /**
