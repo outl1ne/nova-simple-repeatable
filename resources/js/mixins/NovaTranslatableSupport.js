@@ -10,14 +10,18 @@ export default {
   },
 
   methods: {
-    getFieldLocales(locales) {
-      return Object.keys(locales)
-        .sort((a, b) => {
+    getFieldLocales(field) {
+      let localeKeys = Object.keys(field.translatable.locales);
+
+      if (field.translatable.prioritize_nova_locale) {
+        localeKeys = localeKeys.sort((a, b) => {
           if (a === Nova.config.locale && b !== Nova.config.locale) return -1;
           if (a !== Nova.config.locale && b === Nova.config.locale) return 1;
           return 0;
-        })
-        .map(key => ({ key, name: locales[key] }));
+        });
+      }
+
+      return localeKeys.map(key => ({ key, name: field.translatable.locales[key] }));
     },
 
     setAllLocales(newLocale) {
