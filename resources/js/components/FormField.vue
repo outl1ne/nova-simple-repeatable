@@ -12,8 +12,8 @@
               style="padding: 0"
               class="ml-auto"
               v-if="rowField.component === 'translatable-field'"
-              :locales="getFieldLocales(rowField.translatable.locales)"
-              :active-locale="activeLocale || getFieldLocales(rowField.translatable.locales)[0].key"
+              :locales="rowField.formattedLocales"
+              :active-locale="activeLocale || rowField.formattedLocales[0].key"
               :locales-with-errors="repeatableValidation.locales[rowField.originalAttribute]"
               @tabClick="setAllLocales"
               @dblclick="setAllLocales"
@@ -110,11 +110,17 @@ export default {
       return fields.map(field => {
         const uniqueAttribute = `${this.field.attribute}---${field.attribute}---${rowIndex}`;
 
+        let formattedLocales = null;
+        if (field.component === 'translatable-field') {
+          formattedLocales = this.getFieldLocales(field);
+        }
+
         return {
           ...field,
           originalAttribute: field.attribute,
           validationKey: uniqueAttribute,
           attribute: uniqueAttribute,
+          formattedLocales,
         };
       });
     },
