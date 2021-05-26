@@ -13,6 +13,7 @@
               class="ml-auto"
               v-if="rowField.component === 'translatable-field'"
               :locales="rowField.formattedLocales"
+              :display-type="rowField.translatable.display_type"
               :active-locale="activeLocale || rowField.formattedLocales[0].key"
               :locales-with-errors="repeatableValidation.locales[rowField.originalAttribute]"
               @tabClick="setAllLocales"
