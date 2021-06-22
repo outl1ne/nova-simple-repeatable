@@ -85,6 +85,10 @@ class SimpleRepeatable extends Field
 
             // Do validation
             $this->resource = $request->findModelOrFail();
+
+            // Explicity resolve fields to get valid nova-translatable rules
+            $this->fields->each->resolve($request);
+
             $rules = $this->getFormattedRules($request);
             Validator::make([$this->attribute => $value], $rules)->validate();
         }
