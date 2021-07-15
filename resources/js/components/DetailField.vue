@@ -9,7 +9,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, i) of field.rows" :key="i" class="nova-resource-table-row">
+            <tr v-for="(row, i) of field.rows" :key="i" class="simple-repeatable-table-row">
               <td
                 class="font-mono text-sm simple-repeatable-detail-field-wrapper"
                 style="height: 2rem"
@@ -141,6 +141,20 @@ export default {
         width: 100% !important;
         padding: 0 !important;
       }
+    }
+  }
+
+  .simple-repeatable-table-row {
+    td {
+      padding: 4px 8px;
+    }
+
+    &:nth-child(even) {
+      background-color: rgb(244, 247, 250);
+    }
+
+    &:hover td {
+      background-color: rgba(65, 154, 220, 0.1) !important;
     }
   }
 }
