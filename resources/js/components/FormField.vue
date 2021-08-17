@@ -14,10 +14,10 @@
               v-if="rowField.component === 'translatable-field'"
               :locales="rowField.formattedLocales"
               :display-type="rowField.translatable.display_type"
-              :active-locale="activeLocale || rowField.formattedLocales[0].key"
+              :active-locale="activeLocales[i] || rowField.formattedLocales[0].key"
               :locales-with-errors="repeatableValidation.locales[rowField.originalAttribute]"
-              @tabClick="setAllLocales"
-              @dblclick="setAllLocales"
+              @tabClick="locale => setAllLocales(`sr-${field.attribute}-${rowField.originalAttribute}`, locale)"
+              @doubleClick="locale => setAllLocales(void 0, locale)"
             />
           </div>
         </div>
@@ -43,6 +43,7 @@
                 :is="`form-${rowField.component}`"
                 :field="rowField"
                 :errors="repeatableValidation.errors"
+                :unique-id="getUniqueId(field, rowField)"
                 class="mr-3"
               />
             </div>
@@ -79,53 +80,16 @@
 import Draggable from 'vuedraggable';
 import { Errors } from 'form-backend-validation';
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
-import NovaTranslatableSupport from '../mixins/NovaTranslatableSupport';
+import HandlesRepeatable from '../mixins/HandlesRepeatable';
 
 export default {
-  mixins: [FormField, HandlesValidationErrors, NovaTranslatableSupport],
+  mixins: [FormField, HandlesValidationErrors, HandlesRepeatable],
 
   components: { Draggable },
 
   props: ['resourceName', 'resourceId', 'field'],
 
-  data() {
-    return {
-      rows: [],
-    };
-  },
-
   methods: {
-    setInitialValue() {
-      this.rows = this.field.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex));
-
-      // Initialize minimum amount of rows
-      if (this.field.minRows && !isNaN(this.field.minRows)) {
-        while (this.rows.length < this.field.minRows) this.addRow();
-      }
-    },
-
-    copyFields(fields, rowIndex = void 0) {
-      if (!rowIndex) rowIndex = this.rows.length;
-
-      // Return an array of fields with unique attribute
-      return fields.map(field => {
-        const uniqueAttribute = `${this.field.attribute}---${field.attribute}---${rowIndex}`;
-
-        let formattedLocales = null;
-        if (field.component === 'translatable-field') {
-          formattedLocales = this.getFieldLocales(field);
-        }
-
-        return {
-          ...field,
-          originalAttribute: field.attribute,
-          validationKey: uniqueAttribute,
-          attribute: uniqueAttribute,
-          formattedLocales,
-        };
-      });
-    },
-
     fill(formData) {
       const ARR_REGEX = () => /\[\d+\]$/g;
       const allValues = [];
@@ -186,10 +150,6 @@ export default {
   },
 
   computed: {
-    fields() {
-      return (this.rows[0] ?? []).filter(field => field.component !== 'hidden-field');
-    },
-
     repeatableValidation() {
       const fields = this.fields;
       const errors = this.errors.errors;
