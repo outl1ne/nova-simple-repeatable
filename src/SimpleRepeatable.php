@@ -107,7 +107,7 @@ class SimpleRepeatable extends Field
 
         $this->imageUploadHandler($value, $rowFiles, $attribute);
 
-        $value = json_encode(array_values($value), true, JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE);
+        $value = json_encode(array_values($value), true);
 
         // Do validation
         $rules = $this->getFormattedRules($request);
