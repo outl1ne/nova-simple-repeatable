@@ -90,26 +90,33 @@ export default {
   props: ['resourceName', 'resourceId', 'field'],
 
   methods: {
-    fill(formData) {
+    fill(baseFormData) {
+      const fieldAttribute = this.field.attribute;
       const ARR_REGEX = () => /\[\d+\]$/g;
-      const allValues = [];
 
       for (const row of this.rows) {
         let formData = new FormData();
         const rowValues = {};
 
         // Fill formData with field values
-        row.forEach(field => field.fill(formData));
+        row.forEach(field => {
+            field.fill(formData);
+
+            if(!formData.has(field.attribute) && field.value) {
+                formData.append(field.attribute, field.value);
+            }
+        });
 
         // Save field values to rowValues
         for (const item of formData) {
           let normalizedValue = null;
 
-          let key = item[0];
-          if (key.split('---').length === 3) {
-            key = key.split('---').slice(1).join('---');
+          let parseName = item[0];
+          if(parseName.split('---').length === 3) {
+            parseName = parseName.split('---').slice(1).join('---');
           }
-          key = key.replace(/---\d+/, '');
+          let index = parseName.replace(/\w+---/, '');
+          let key = parseName.replace(/---\d+/, '');
 
           // Is key is an array, we need to remove the '.en' part from '.en[0]'
           const isArray = !!key.match(ARR_REGEX());
@@ -132,12 +139,10 @@ export default {
           } else {
             rowValues[key] = normalizedValue;
           }
+
+          baseFormData.append(fieldAttribute + '[' + index + '][' + key + ']', rowValues[key]);
         }
-
-        allValues.push(rowValues);
       }
-
-      formData.append(this.field.attribute, JSON.stringify(allValues));
     },
 
     addRow() {
