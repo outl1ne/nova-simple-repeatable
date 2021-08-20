@@ -105,9 +105,11 @@ class SimpleRepeatable extends Field
 
         $this->removeUnusedImages($model, $attribute, $value, $rowFiles);
 
-        $this->imageUploadHandler($value, $rowFiles, $attribute);
+        if ($value) {
+            $this->imageUploadHandler($value, $rowFiles, $attribute);
 
-        $value = json_encode(array_values($value), true);
+            $value = json_encode(array_values($value), true);
+        }
 
         // Do validation
         $rules = $this->getFormattedRules($request);
