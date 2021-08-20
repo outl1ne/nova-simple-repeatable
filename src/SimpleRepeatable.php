@@ -107,7 +107,7 @@ class SimpleRepeatable extends Field
 
         $this->imageUploadHandler($value, $rowFiles, $attribute);
 
-        $value = json_encode(array_values($value), true);
+        $value = json_encode(array_values($value), true, JSON_UNESCAPED_SLASHES + JSON_UNESCAPED_UNICODE);
 
         // Do validation
         $rules = $this->getFormattedRules($request);
@@ -142,14 +142,17 @@ class SimpleRepeatable extends Field
      */
     protected function removeUnusedImages($model, $attribute, $value, $rowFiles)
     {
-        $currentValues = json_decode($model->{$attribute} ?: [], true);
-        foreach ($currentValues as $index => $row) {
-            $files = $this->getFileColumns($row);
+        $currentValues = is_array($model->{$attribute}) ? null : json_decode($model->{$attribute}, true);
 
-            if (count($files) > 0) {
-                foreach ($files as $file) {
-                    if (!isset($value[$index]) || isset($rowFiles[$index])) {
-                        Storage::disk('public')->delete($file);
+        if ($currentValues) {
+            foreach ($currentValues as $index => $row) {
+                $files = $this->getFileColumns($row);
+
+                if (count($files) > 0) {
+                    foreach ($files as $file) {
+                        if (!isset($value[$index]) || isset($rowFiles[$index])) {
+                            Storage::disk('public')->delete($file);
+                        }
                     }
                 }
             }

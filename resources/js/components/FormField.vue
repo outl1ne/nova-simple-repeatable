@@ -94,6 +94,7 @@ export default {
       const fieldAttribute = this.field.attribute;
       const ARR_REGEX = () => /\[\d+\]$/g;
 
+      let rowIndex = 0;
       for (const row of this.rows) {
         let formData = new FormData();
         const rowValues = {};
@@ -111,12 +112,11 @@ export default {
         for (const item of formData) {
           let normalizedValue = null;
 
-          let parseName = item[0];
-          if(parseName.split('---').length === 3) {
-            parseName = parseName.split('---').slice(1).join('---');
+          let key = item[0];
+          if(key.split('---').length === 3) {
+            key = key.split('---').slice(1).join('---');
           }
-          let index = parseName.replace(/\w+---/, '');
-          let key = parseName.replace(/---\d+/, '');
+          key = key.replace(/---\d+/, '');
 
           // Is key is an array, we need to remove the '.en' part from '.en[0]'
           const isArray = !!key.match(ARR_REGEX());
@@ -133,15 +133,20 @@ export default {
             normalizedValue = item[1];
           }
 
+          let itemName = fieldAttribute + '[' + rowIndex + '][' + key + ']';
+
           if (isArray) {
             if (!rowValues[key]) rowValues[key] = [];
             rowValues[key].push(normalizedValue);
+          } else if(normalizedValue instanceof Object && !(normalizedValue instanceof File)) {
+            for (const valueKey in normalizedValue) {
+                baseFormData.append(itemName + '[' + valueKey + ']', normalizedValue[valueKey]);
+            }
           } else {
-            rowValues[key] = normalizedValue;
+            baseFormData.append(itemName, normalizedValue);
           }
-
-          baseFormData.append(fieldAttribute + '[' + index + '][' + key + ']', rowValues[key]);
         }
+        rowIndex++;
       }
     },
 
