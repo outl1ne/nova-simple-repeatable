@@ -1,5 +1,5 @@
 <template>
-  <default-field :field="field" :errors="errors" :show-help-text="showHelpText" class="simple-repeatable">
+  <default-field :field="field" :errors="errors" :show-help-text="showHelpText" class="simple-repeatable form-field">
     <template slot="field">
       <div class="flex flex-col">
         <!-- Title columns -->
@@ -209,7 +209,7 @@ export default {
 </script>
 
 <style lang="scss">
-.simple-repeatable {
+.simple-repeatable.form-field {
   .simple-repeatable-header-row {
     width: 100%;
   }

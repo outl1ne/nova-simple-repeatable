@@ -1,5 +1,5 @@
 <template>
-  <panel-item :field="field" class="simple-repeatable">
+  <panel-item :field="field" class="simple-repeatable detail-field">
     <template slot="value">
       <!-- Title columns -->
       <div v-if="field.rows.length" class="simple-repeatable-header-row flex border-b border-40 py-2">
@@ -134,7 +134,7 @@ export default {
 </script>
 
 <style lang="scss">
-.simple-repeatable {
+.simple-repeatable.detail-field {
   .simple-repeatable-detail-field-wrapper {
     > *,
         // Improve compatibility with nova-translatable
