@@ -29,6 +29,7 @@ class SimpleRepeatable extends Field
         $this->canAddRows(true);
         $this->canDeleteRows(true);
         $this->hideFromIndex();
+        $this->rowLabel(trans('simpleRepeatable.addRow'));
     }
 
     public function fields($fields = [])
@@ -56,6 +57,10 @@ class SimpleRepeatable extends Field
         return $this->withMeta(['canDeleteRows' => $canDeleteRows]);
     }
 
+    public function rowLabel($label)
+    {
+        return $this->withMeta(['rowLabel' => $label]);
+    }
     /**
      *
      * Validate and hydrate the given attribute on the model based on the incoming request.
