@@ -1,4 +1,5 @@
 export default {
+
   data() {
     return {
       rows: [],
@@ -6,7 +7,7 @@ export default {
     };
   },
 
-  mounted() {
+  mounted: function() {
     this.rows = this.field.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex));
 
     // Listen to active locales (nova-translatable support)
