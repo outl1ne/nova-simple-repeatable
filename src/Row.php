@@ -1,6 +1,6 @@
 <?php
 
-namespace OptimistDigital\NovaSimpleRepeatable;
+namespace Outl1ne\NovaSimpleRepeatable;
 
 use JsonSerializable;
 use Laravel\Nova\Fields\Field;

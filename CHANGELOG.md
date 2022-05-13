@@ -117,7 +117,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added `minRows` config option [Artexis10](https://github.com/Artexis10)
 - Initializes the minimum amount of rows defined by user [Artexis10](https://github.com/Artexis10)
-- Added [nova-translatable](https://github.com/optimistdigital/nova-translatable) support
+- Added [nova-translatable](https://github.com/outl1ne/nova-translatable) support
 
 ### Changed
 

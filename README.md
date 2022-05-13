@@ -1,14 +1,14 @@
 # Nova Simple Repeatable
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/optimistdigital/nova-simple-repeatable.svg?style=flat-square)](https://packagist.org/packages/optimistdigital/nova-simple-repeatable)
-[![Total Downloads](https://img.shields.io/packagist/dt/optimistdigital/nova-simple-repeatable.svg?style=flat-square)](https://packagist.org/packages/optimistdigital/nova-simple-repeatable)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/outl1ne/nova-simple-repeatable.svg?style=flat-square)](https://packagist.org/packages/outl1ne/nova-simple-repeatable)
+[![Total Downloads](https://img.shields.io/packagist/dt/outl1ne/nova-simple-repeatable.svg?style=flat-square)](https://packagist.org/packages/outl1ne/nova-simple-repeatable)
 
 This [Laravel Nova](https://nova.laravel.com/) package allows you to create simple horizontal rows of fields that the user can add/remove.
 
 ## Requirements
 
-- `php: >=7.2`
-- `laravel/nova: ^3.0`
+- `php: >=8.0`
+- `laravel/nova: ^4.0`
 
 ## Features
 
@@ -23,13 +23,13 @@ A Laravel Nova simple repeatable rows field.
 Install the package in to a Laravel app that uses [Nova](https://nova.laravel.com) via composer:
 
 ```bash
-composer require optimistdigital/nova-simple-repeatable
+composer require outl1ne/nova-simple-repeatable
 ```
 
 ## Usage
 
 ```php
-use OptimistDigital\NovaSimpleRepeatable\SimpleRepeatable;
+use Outl1ne\NovaSimpleRepeatable\SimpleRepeatable;
 
 public function fields(Request $request) {
     SimpleRepeatable::make('Users', 'users', [
@@ -47,7 +47,7 @@ public function fields(Request $request) {
 The translations file can be published by using the following publish command:
 
 ```bash
-php artisan vendor:publish --provider="OptimistDigital\NovaSimpleRepeatable\SimpleRepeatableServiceProvider" --tag="translations"
+php artisan vendor:publish --provider="Outl1ne\NovaSimpleRepeatable\SimpleRepeatableServiceProvider" --tag="translations"
 ```
 
 You can then edit the strings to your liking.

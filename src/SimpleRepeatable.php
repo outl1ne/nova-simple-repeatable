@@ -1,6 +1,6 @@
 <?php
 
-namespace OptimistDigital\NovaSimpleRepeatable;
+namespace Outl1ne\NovaSimpleRepeatable;
 
 use Exception;
 use Laravel\Nova\Nova;

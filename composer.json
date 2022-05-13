@@ -1,5 +1,5 @@
 {
-  "name": "optimistdigital/nova-simple-repeatable",
+  "name": "outl1ne/nova-simple-repeatable",
   "description": "A Laravel Nova simple repeatable rows field.",
   "keywords": [
     "laravel",
@@ -12,22 +12,32 @@
   ],
   "license": "MIT",
   "require": {
-    "php": "^8.0",
-    "laravel/nova": "~4.0",
-    "optimistdigital/nova-translations-loader": "^4.0"
+    "php": ">=8.0",
+    "laravel/nova": "^4.0",
+    "outl1ne/nova-translations-loader": "^5.0"
   },
   "autoload": {
     "psr-4": {
-      "OptimistDigital\\NovaSimpleRepeatable\\": "src/"
+      "Outl1ne\\NovaSimpleRepeatable\\": "src/"
     }
   },
   "extra": {
     "laravel": {
       "providers": [
-        "OptimistDigital\\NovaSimpleRepeatable\\SimpleRepeatableServiceProvider"
+        "Outl1ne\\NovaSimpleRepeatable\\SimpleRepeatableServiceProvider"
       ]
     }
   },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://nova.laravel.com"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/laravel/nova-dusk-suite"
+    }
+  ],
   "config": {
     "sort-packages": true
   },
