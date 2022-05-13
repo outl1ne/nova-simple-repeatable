@@ -27,7 +27,7 @@
   "dependencies": {
     "@inertiajs/inertia": "^0.11.0",
     "vue": "^3.2.33",
-    "vuedraggable": "^2.24.3",
+    "vuedraggable": "^4.1.0",
     "vuex": "^4.0.2"
   }
 }
