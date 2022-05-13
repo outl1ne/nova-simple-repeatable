@@ -1,24 +1,7 @@
 <template>
-  <panel-item :field="field" class="simple-repeatable detail-field">
-    <template slot="value">
-      <!-- Title columns -->
-      <div v-if="field.rows.length" class="simple-repeatable-header-row flex border-b border-40 py-2">
-        <div v-for="(rowField, i) in fields" :key="i" class="font-bold text-90 text-md w-full ml-3 flex">
-          {{ rowField.name }}
+ <PanelItem :index="index" :field="field" class="simple-repeatable detail-field">
+    <template #value>
 
-          <!--  If field is nova-translatable, render seperate locale-tabs   -->
-          <nova-translatable-locale-tabs
-            style="padding: 0"
-            class="ml-auto"
-            v-if="rowField.component === 'translatable-field'"
-            :locales="rowField.formattedLocales"
-            :display-type="rowField.translatable.display_type"
-            :active-locale="activeLocales[i] || rowField.formattedLocales[0].key"
-            @tabClick="locale => setAllLocales(`sr-${field.attribute}-${rowField.originalAttribute}`, locale)"
-            @doubleClick="locale => setAllLocales(void 0, locale)"
-          />
-        </div>
-      </div>
 
       <div class="overflow-hidden relative rounded-lg bg-white shadow border border-60" v-if="values && values.length">
         <table class="table w-full table-default nova-resource-table">
@@ -50,14 +33,14 @@
 
       <div v-else>{{ (value && value.label) || '—' }}</div>
     </template>
-  </panel-item>
+  </PanelItem>
 </template>
 
 <script>
 import HandlesRepeatable from '../mixins/HandlesRepeatable';
 
 export default {
-  props: ['resource', 'resourceName', 'resourceId', 'field'],
+  props: ['index', 'resource', 'resourceName', 'resourceId', 'field'],
 
   mixins: [HandlesRepeatable],
 

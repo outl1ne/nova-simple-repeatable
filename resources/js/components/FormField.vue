@@ -1,6 +1,6 @@
 <template>
-  <default-field :field="field" :errors="errors" :show-help-text="showHelpText" class="simple-repeatable form-field">
-    <template slot="field">
+ <DefaultField :field="field" :errors="errors" :show-help-text="showHelpText" class="simple-repeatable form-field">
+    <template #field>
       <div class="flex flex-col">
         <!-- Title columns -->
         <div v-if="rows.length" class="simple-repeatable-header-row flex border-b border-40 py-2">
@@ -21,11 +21,10 @@
             />
           </div>
         </div>
-
-        <draggable v-model="rows" handle=".vue-draggable-handle">
+        <draggable :list="rows" :item-key="[0].uniqueKey" @change="log($event)" handle=".vue-draggable-handle">
+           <template #item="{element, index}" :key="index">
           <div
-            v-for="(row, i) in rows"
-            :key="row[0].attribute"
+
             class="simple-repeatable-row flex py-3 pl-3 relative rounded-md"
           >
             <div class="vue-draggable-handle flex justify-center items-center cursor-pointer">
@@ -38,7 +37,7 @@
 
             <div class="simple-repeatable-fields-wrapper w-full flex">
               <component
-                v-for="(rowField, j) in row"
+                v-for="(rowField, j) in element"
                 :key="j"
                 :is="`form-${rowField.component}`"
                 :field="rowField"
@@ -46,6 +45,7 @@
                 :unique-id="getUniqueId(field, rowField)"
                 class="mr-3"
               />
+
             </div>
 
             <div
@@ -60,9 +60,10 @@
               </svg>
             </div>
           </div>
+           </template>
         </draggable>
 
-        <button
+        <DefaultButton
           v-if="canAddRows"
           @click="addRow"
           class="add-button btn btn-default btn-primary"
@@ -70,10 +71,10 @@
           type="button"
         >
           {{ __('simpleRepeatable.addRow') }}
-        </button>
+        </DefaultButton>
       </div>
     </template>
-  </default-field>
+  </DefaultField>
 </template>
 
 <script>
@@ -146,7 +147,7 @@ export default {
 
     deleteRow(index) {
       this.rows.splice(index, 1);
-    },
+    }
   },
 
   computed: {
