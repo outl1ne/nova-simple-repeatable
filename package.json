@@ -12,21 +12,23 @@
   },
   "devDependencies": {
     "@vue/babel-plugin-jsx": "^1.1.1",
-    "@vue/compiler-sfc": "^3.2.33",
-    "eslint": "^7.32.0",
+    "@vue/compiler-sfc": "^3.2.36",
+    "eslint": "^8.16.0",
     "form-backend-validation": "^2.4.0",
     "laravel-mix": "^6.0.43",
     "lodash": "^4.17.21",
-    "postcss": "^8.4.13",
+    "postcss": "^8.4.14",
+    "postcss-import": "^14.1.0",
     "prettier": "^2.6.2",
     "resolve-url-loader": "^5.0.0",
-    "sass": "^1.51.0",
+    "sass": "^1.52.1",
     "sass-loader": "^12.6.0",
+    "tailwindcss": "^3.0.24",
     "vue-loader": "^17.0.0"
   },
   "dependencies": {
     "@inertiajs/inertia": "^0.11.0",
-    "vue": "^3.2.33",
+    "vue": "^3.2.36",
     "vuedraggable": "^4.1.0",
     "vuex": "^4.0.2"
   }
