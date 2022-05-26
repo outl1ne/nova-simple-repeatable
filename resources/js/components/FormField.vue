@@ -41,7 +41,7 @@
                 </svg>
               </div>
 
-              <div class="simple-repeatable-fields-wrapper w-full flex">
+              <div class="simple-repeatable-fields-wrapper nsr-w-full nsr-flex">
                 <component
                   v-for="(rowField, j) in element"
                   :key="j"
@@ -97,6 +97,7 @@ import Draggable from 'vuedraggable';
 import { Errors } from 'form-backend-validation';
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
 import HandlesRepeatable from '../mixins/HandlesRepeatable';
+import _set from 'lodash/set';
 
 export default {
   mixins: [FormField, HandlesValidationErrors, HandlesRepeatable],
@@ -114,6 +115,7 @@ export default {
   methods: {
     fill(formData) {
       const ARR_REGEX = () => /\[\d+\]$/g;
+
       const allValues = [];
 
       for (const row of this.rows) {
@@ -152,7 +154,7 @@ export default {
             if (!rowValues[key]) rowValues[key] = [];
             rowValues[key].push(normalizedValue);
           } else {
-            rowValues[key] = normalizedValue;
+            _set(rowValues, key, normalizedValue);
           }
         }
 
@@ -236,6 +238,10 @@ export default {
     width: calc(100% + 68px);
 
     > .simple-repeatable-fields-wrapper {
+      .translatable-field {
+        padding-top: 0 !important;
+      }
+
       > *,
         // Improve compatibility with nova-translatable
       .translatable-field > div:not(:first-child) > div {
