@@ -69,7 +69,7 @@
           :class="{ 'delete-width': canDeleteRows, 'mt-3': rows.length }"
           type="button"
         >
-          {{ field.rowLabel }}
+          {{ field.addRowLabel }}
         </button>
       </div>
     </template>

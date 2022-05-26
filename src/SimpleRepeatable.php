@@ -29,7 +29,7 @@ class SimpleRepeatable extends Field
         $this->canAddRows(true);
         $this->canDeleteRows(true);
         $this->hideFromIndex();
-        $this->rowLabel(trans('simpleRepeatable.addRow'));
+        $this->addRowLabel(__('simpleRepeatable.addRow'));
     }
 
     public function fields($fields = [])
@@ -57,9 +57,9 @@ class SimpleRepeatable extends Field
         return $this->withMeta(['canDeleteRows' => $canDeleteRows]);
     }
 
-    public function rowLabel($label)
+    public function addRowLabel($label)
     {
-        return $this->withMeta(['rowLabel' => $label]);
+        return $this->withMeta(['addRowLabel' => $label]);
     }
     /**
      *
