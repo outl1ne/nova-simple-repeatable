@@ -85,7 +85,7 @@
           :class="{ 'delete-width': canDeleteRows, 'mt-3': rows.length }"
           type="button"
         >
-          {{ __('simpleRepeatable.addRow') }}
+          {{ field.addRowLabel }}
         </DefaultButton>
       </div>
     </template>
