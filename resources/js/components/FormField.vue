@@ -31,7 +31,7 @@
           :item-key="(el, i) => (el && el[0] && el[0].attribute) || i"
           handle=".vue-draggable-handle"
         >
-          <template #item="{ element }">
+          <template #item="{ element, index }">
             <div class="simple-repeatable-row nsr-flex nsr-py-3 nsr-pl-3 nsr-relative nsr-rounded-md">
               <div class="vue-draggable-handle nsr-flex nsr-justify-center nsr-items-center nsr-cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" class="fill-current">
@@ -54,12 +54,8 @@
               </div>
 
               <div
-                class="
-                  delete-icon
-                  nsr-flex nsr-justify-center nsr-items-center nsr-cursor-pointer nsr-fill-current
-                  hover:nsr-fill-red-600
-                "
-                @click="deleteRow(i)"
+                class="delete-icon nsr-flex nsr-justify-center nsr-items-center nsr-cursor-pointer nsr-fill-current hover:nsr-fill-red-600"
+                @click="deleteRow(index)"
                 v-if="canDeleteRows"
               >
                 <svg
@@ -105,12 +101,6 @@ export default {
   components: { Draggable },
 
   props: ['resourceName', 'resourceId', 'field'],
-
-  watch: {
-    rows(a) {
-      console.info(a);
-    },
-  },
 
   methods: {
     fill(formData) {
