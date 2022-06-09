@@ -10,28 +10,27 @@ export default {
     this.rows = this.field.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex));
 
     // Listen to active locales (nova-translatable support)
-    if (this.fields) {
-      this.fields.forEach((field, i) => {
-        this.activeLocales[i] = void 0;
+    (this.field.fields || []).forEach((field, i) => {
+      if (field.component !== 'translatable-field') return;
 
-        const id =
-          field.component === 'translatable-field' ? `sr-${this.field.attribute}-${field.originalAttribute}` : void 0;
-        const eventName = this.getAllLocalesEventName(id);
-        Nova.$on(eventName, locale => {
-          this.activeLocales = {
-            ...this.activeLocales,
-            [i]: locale,
-          };
-        });
+      this.activeLocales[i] = void 0;
 
-        Nova.$on(this.getAllLocalesEventName(void 0), locale => {
-          this.activeLocales = {
-            ...this.activeLocales,
-            [i]: locale,
-          };
-        });
+      const id = field.component === 'translatable-field' ? `sr-${this.field.attribute}-${field.attribute}` : void 0;
+      const eventName = this.getAllLocalesEventName(id);
+      Nova.$on(eventName, locale => {
+        this.activeLocales = {
+          ...this.activeLocales,
+          [i]: locale,
+        };
       });
-    }
+
+      Nova.$on(this.getAllLocalesEventName(void 0), locale => {
+        this.activeLocales = {
+          ...this.activeLocales,
+          [i]: locale,
+        };
+      });
+    });
   },
 
   methods: {
