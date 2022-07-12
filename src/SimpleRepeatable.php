@@ -1,26 +1,40 @@
 <?php
-
-namespace Outl1ne\NovaSimpleRepeatable;
+namespace OptimistDigital\NovaSimpleRepeatable;
 
 use Exception;
+use ReflectionMethod;
 use Laravel\Nova\Nova;
 use Laravel\Nova\Fields\Field;
 use Illuminate\Support\Collection;
 use Laravel\Nova\PerformsValidation;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Nova\Fields\FieldCollection;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use ReflectionMethod;
 
 class SimpleRepeatable extends Field
 {
     use PerformsValidation;
 
+    /**
+     * @var string
+     */
     public $component = 'simple-repeatable';
 
+    /**
+     * @var array
+     */
     protected $fields = [];
+    /**
+     * @var array
+     */
     protected $rows = [];
 
+    /**
+     * @param $name
+     * @param $attribute
+     * @param array $fields
+     */
     public function __construct($name, $attribute = null, $fields = [])
     {
         parent::__construct($name, $attribute, null);
@@ -29,37 +43,50 @@ class SimpleRepeatable extends Field
         $this->canAddRows(true);
         $this->canDeleteRows(true);
         $this->hideFromIndex();
-        $this->addRowLabel(__('simpleRepeatable.addRow'));
     }
 
+    /**
+     * @param array $fields
+     */
     public function fields($fields = [])
     {
         $this->fields = FieldCollection::make($fields);
     }
 
+    /**
+     * @param $minRows
+     * @return mixed
+     */
     public function minRows($minRows = null)
     {
         return $this->withMeta(['minRows' => $minRows]);
     }
 
+    /**
+     * @param $maxRows
+     * @return mixed
+     */
     public function maxRows($maxRows = null)
     {
         return $this->withMeta(['maxRows' => $maxRows]);
     }
 
+    /**
+     * @param $canAddRows
+     * @return mixed
+     */
     public function canAddRows($canAddRows = true)
     {
         return $this->withMeta(['canAddRows' => $canAddRows]);
     }
 
+    /**
+     * @param $canDeleteRows
+     * @return mixed
+     */
     public function canDeleteRows($canDeleteRows = true)
     {
         return $this->withMeta(['canDeleteRows' => $canDeleteRows]);
-    }
-
-    public function addRowLabel($label)
-    {
-        return $this->withMeta(['addRowLabel' => $label]);
     }
 
     /**
@@ -74,7 +101,15 @@ class SimpleRepeatable extends Field
     protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         $value = $request->input($requestAttribute) ?? null;
-        $value = json_decode($value, true);
+        $rowFiles = $request->file($requestAttribute) ?? null;
+
+        $this->removeUnusedImages($model, $attribute, $value, $rowFiles);
+
+        if ($value) {
+            $this->imageUploadHandler($value, $rowFiles, $attribute);
+
+            $value = json_encode(array_values($value), true);
+        }
 
         // Do validation
         $rules = $this->getFormattedRules($request);
@@ -83,6 +118,68 @@ class SimpleRepeatable extends Field
         $model->{$attribute} = $value;
     }
 
+    /**
+     * @param $attribute
+     * @param $value
+     * @param $rowFiles
+     */
+    protected function imageUploadHandler(&$value, $rowFiles, $attribute)
+    {
+        if (!$rowFiles) {
+            return false;
+        }
+
+        foreach ($rowFiles as $row => $files) {
+            foreach ($files as $key => $file) {
+                $value[$row][$key] = $file->store($attribute, 'public');
+            }
+        }
+    }
+
+    /**
+     * @param $model
+     * @param $attribute
+     * @param $value
+     * @param $rowFiles
+     */
+    protected function removeUnusedImages($model, $attribute, $value, $rowFiles)
+    {
+        $currentValues = is_array($model->{$attribute}) ? null : json_decode($model->{$attribute}, true);
+
+        if ($currentValues) {
+            foreach ($currentValues as $index => $row) {
+                $files = $this->getFileColumns($row);
+
+                if (count($files) > 0) {
+                    foreach ($files as $file) {
+                        if (!isset($value[$index]) || isset($rowFiles[$index])) {
+                            Storage::disk('public')->delete($file);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $row
+     */
+    protected function getFileColumns($row)
+    {
+        $data = [];
+        $types = array_intersect(array_keys($row), ['image', 'file']);
+
+        foreach ($types as $key => $type) {
+            $data[$key] = $row[$type];
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param NovaRequest $request
+     * @param $model
+     */
     public function fill(NovaRequest $request, $model)
     {
         if (get_class($model) === 'Whitecube\NovaFlexibleContent\Layouts\Layout') {
@@ -102,6 +199,10 @@ class SimpleRepeatable extends Field
         parent::fill($request, $model);
     }
 
+    /**
+     * @param NovaRequest $request
+     * @return mixed
+     */
     protected function getFormattedRules(NovaRequest $request)
     {
         $rules = static::formatRules(
@@ -121,7 +222,9 @@ class SimpleRepeatable extends Field
                 $formatRules = new ReflectionMethod($resource, 'formatRules');
                 $formatRules->setAccessible(true);
                 $newRules = $formatRules->invoke(new $resource($this->resource), $request, $rules);
-                if ($newRules) $rules = $newRules;
+                if ($newRules) {
+                    $rules = $newRules;
+                }
             } catch (Exception $e) {
             }
         }
@@ -153,7 +256,7 @@ class SimpleRepeatable extends Field
 
         $this->withMeta([
             'rows' => $this->rows,
-            'fields' => $this->fields->resolve(null) // Empty fields
+            'fields' => $this->fields->resolve(null), // Empty fields
         ]);
 
         return parent::resolve($resource, $attribute);
@@ -170,6 +273,7 @@ class SimpleRepeatable extends Field
     public function buildRows($resource, $attribute)
     {
         $value = $this->extractValueFromResource($resource, $attribute);
+
         return collect($value)->map(function ($rowValue) {
             return Row::make($this->fields, (array) $rowValue);
         })->filter()->values();
@@ -197,10 +301,12 @@ class SimpleRepeatable extends Field
         }
 
         // Fail silently in case data is invalid
-        if (!is_array($value)) return [];
+        if (!is_array($value)) {
+            return [];
+        }
 
         return array_map(function ($item) {
-            return is_array($item) ? (object)$item : $item;
+            return is_array($item) ? (object) $item : $item;
         }, $value);
     }
 }
