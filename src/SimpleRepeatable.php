@@ -160,6 +160,37 @@ class SimpleRepeatable extends Field
     }
 
     /**
+     * Resolve the field's and it's rows value.
+     *
+     * @param mixed $resource
+     * @param string|null $attribute
+     * @return void
+     */
+    public function resolveForAction($resource, $attribute = null)
+    {
+        // TODO: group the following codes with resolve(), or just do $this->resolve($resource, $attribute) instead
+        $novaRequest = app()->make(NovaRequest::class);
+        $resolveForDisplay = $novaRequest->isResourceIndexRequest() || $novaRequest->isResourceDetailRequest();
+
+        $attribute = $attribute ?? $this->attribute;
+        $this->rows = $this->buildRows($resource, $attribute);
+
+        // Resolve rows
+        if ($resolveForDisplay) {
+            $this->rows->each->resolveForDisplay();
+        } else {
+            $this->rows->each->resolve();
+        }
+
+        $this->withMeta([
+            'rows' => $this->rows,
+            'fields' => $this->fields->resolve(null) // Empty fields
+        ]);
+
+        return parent::resolveForAction($resource, $attribute);
+    }
+
+    /**
      * Define the field's actual rows (as "base models") based
      * on the field's current model & attribute
      *
