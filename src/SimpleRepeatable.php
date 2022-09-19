@@ -90,7 +90,7 @@ class SimpleRepeatable extends Field
             $value = json_decode($value, true);
 
             // Do validation
-            $this->resource = $request->findModelOrFail();
+            if ($request->resourceId) $this->resource = $request->findModelOrFail();
 
             // Explicity resolve fields to get valid nova-translatable rules
             $this->fields->each->resolve($request);
