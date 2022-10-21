@@ -2,12 +2,7 @@
   <PanelItem :index="index" :field="field" class="simple-repeatable detail-field">
     <template #value>
       <div
-        class="
-          nsr-overflow-hidden nsr-relative nsr-rounded-lg nsr-shadow nsr-border nsr-border-slate-200
-          dark:nsr-border-slate-600
-          bg-white
-          dark:nsr-bg-slate-800
-        "
+        class="nsr-overflow-hidden nsr-relative nsr-rounded-lg nsr-shadow nsr-border nsr-border-slate-200 dark:nsr-border-slate-600 bg-white dark:nsr-bg-slate-800"
         v-if="values && values.length"
       >
         <table class="nsr-table nsr-w-full nsr-table-default nova-resource-table">
@@ -20,12 +15,7 @@
             <tr
               v-for="(row, i) of field.rows"
               :key="i"
-              class="
-                simple-repeatable-table-row
-                odd:nsr-bg-slate-50
-                hover:nsr-bg-slate-100
-                dark:odd:nsr-bg-slate-700 dark:hover:nsr-bg-slate-600
-              "
+              class="simple-repeatable-table-row odd:nsr-bg-slate-50 hover:nsr-bg-slate-100 dark:odd:nsr-bg-slate-700 dark:hover:nsr-bg-slate-600"
             >
               <td
                 class="nsr-font-mono nsr-text-sm simple-repeatable-detail-field-wrapper"

@@ -91,9 +91,7 @@ class SimpleRepeatable extends Field
             $value = json_decode($value, true);
 
             // Do validation
-            if ($request->resourceId) {
-                $this->resource = $request->findModelOrFail();
-            }
+            if ($request->resourceId) $this->resource = $request->findModelOrFail();
 
             // Explicity resolve fields to get valid nova-translatable rules
             $this->fields->each->resolve($request);
@@ -124,9 +122,7 @@ class SimpleRepeatable extends Field
                 $formatRules = new ReflectionMethod($resource, 'formatRules');
                 $formatRules->setAccessible(true);
                 $newRules = $formatRules->invoke(new $resource($this->resource), $request, $rules);
-                if ($newRules) {
-                    $rules = $newRules;
-                }
+                if ($newRules) $rules = $newRules;
             } catch (Exception $e) {
             }
         }
@@ -197,14 +193,12 @@ class SimpleRepeatable extends Field
 
         if ($value instanceof Collection) {
             $value = $value->toArray();
-        } elseif (is_string($value)) {
+        } else if (is_string($value)) {
             $value = json_decode($value, true) ?? [];
         }
 
         // Fail silently in case data is invalid
-        if (!is_array($value)) {
-            return [];
-        }
+        if (!is_array($value)) return [];
 
         return array_map(function ($item) {
             return is_array($item) ? (object)$item : $item;

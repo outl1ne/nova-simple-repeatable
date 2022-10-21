@@ -1,5 +1,10 @@
 <template>
-  <DefaultField :field="currentField" :errors="errors" :show-help-text="showHelpText" class="simple-repeatable form-field">
+  <DefaultField
+    :field="currentField"
+    :errors="errors"
+    :show-help-text="showHelpText"
+    class="simple-repeatable form-field"
+  >
     <template #field>
       <div class="flex flex-col" v-bind="extraAttributes">
         <!-- Title columns -->
@@ -165,10 +170,10 @@ export default {
 
   computed: {
     extraAttributes() {
-      const attrs = this.currentField.extraAttributes
+      const attrs = this.currentField.extraAttributes;
       return {
-          ...attrs,
-      }
+        ...attrs,
+      };
     },
     repeatableValidation() {
       const fields = this.fields;
