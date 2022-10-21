@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 21-07-2022
+
+### Added
+
+- Simple repeatable field now supports dependsOn. (thanks to [@mlopezsti](https://github.com/mlopezsti))
+
+**NB! This does not include the fields inside SimpleRepeatable, only the SimpleRepeatable field itself.**
+
 ## [2.0.2] - 19-06-2022
 
 ### Changed
