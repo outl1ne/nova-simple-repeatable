@@ -219,14 +219,14 @@ export default {
     },
 
     canAddRows() {
-      if (!this.field.canAddRows) return false;
-      if (!!this.field.maxRows) return this.rows.length < this.field.maxRows;
+      if (!this.currentField.canAddRows) return false;
+      if (!!this.currentField.maxRows) return this.rows.length < this.currentField.maxRows;
       return true;
     },
 
     canDeleteRows() {
-      if (!this.field.canDeleteRows) return false;
-      if (!!this.field.minRows) return this.rows.length > this.field.minRows;
+      if (!this.currentField.canDeleteRows) return false;
+      if (!!this.currentField.minRows) return this.rows.length > this.currentField.minRows;
       return true;
     },
   },
