@@ -8,6 +8,7 @@ use Laravel\Nova\Fields\Field;
 use Illuminate\Support\Collection;
 use Laravel\Nova\PerformsValidation;
 use Laravel\Nova\Fields\FieldCollection;
+use Laravel\Nova\Fields\SupportsDependentFields;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use ReflectionMethod;
@@ -15,6 +16,7 @@ use ReflectionMethod;
 class SimpleRepeatable extends Field
 {
     use PerformsValidation;
+    use SupportsDependentFields;
 
     public $component = 'simple-repeatable';
 
@@ -90,7 +92,9 @@ class SimpleRepeatable extends Field
             $value = json_decode($value, true);
 
             // Do validation
-            if ($request->resourceId) $this->resource = $request->findModelOrFail();
+            if ($request->resourceId) {
+                $this->resource = $request->findModelOrFail();
+            }
 
             // Explicity resolve fields to get valid nova-translatable rules
             $this->fields->each->resolve($request);
@@ -121,7 +125,9 @@ class SimpleRepeatable extends Field
                 $formatRules = new ReflectionMethod($resource, 'formatRules');
                 $formatRules->setAccessible(true);
                 $newRules = $formatRules->invoke(new $resource($this->resource), $request, $rules);
-                if ($newRules) $rules = $newRules;
+                if ($newRules) {
+                    $rules = $newRules;
+                }
             } catch (Exception $e) {
             }
         }
@@ -192,12 +198,14 @@ class SimpleRepeatable extends Field
 
         if ($value instanceof Collection) {
             $value = $value->toArray();
-        } else if (is_string($value)) {
+        } elseif (is_string($value)) {
             $value = json_decode($value, true) ?? [];
         }
 
         // Fail silently in case data is invalid
-        if (!is_array($value)) return [];
+        if (!is_array($value)) {
+            return [];
+        }
 
         return array_map(function ($item) {
             return is_array($item) ? (object)$item : $item;
