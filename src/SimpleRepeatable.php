@@ -15,8 +15,7 @@ use ReflectionMethod;
 
 class SimpleRepeatable extends Field
 {
-    use PerformsValidation;
-    use SupportsDependentFields;
+    use PerformsValidation, SupportsDependentFields;
 
     public $component = 'simple-repeatable';
 
