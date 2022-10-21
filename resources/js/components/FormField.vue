@@ -1,7 +1,12 @@
 <template>
-  <DefaultField :field="field" :errors="errors" :show-help-text="showHelpText" class="simple-repeatable form-field">
+  <DefaultField
+    :field="currentField"
+    :errors="errors"
+    :show-help-text="showHelpText"
+    class="simple-repeatable form-field"
+  >
     <template #field>
-      <div class="flex flex-col">
+      <div class="flex flex-col" v-bind="extraAttributes">
         <!-- Title columns -->
         <div v-if="rows.length" class="nsr-w-full nsr-flex nsr-border-b nsr-py-2 dark:nsr-border-slate-600">
           <div
@@ -91,12 +96,12 @@
 <script>
 import Draggable from 'vuedraggable';
 import { Errors } from 'form-backend-validation';
-import { FormField, HandlesValidationErrors } from 'laravel-nova';
+import { FormField, HandlesValidationErrors, DependentFormField } from 'laravel-nova';
 import HandlesRepeatable from '../mixins/HandlesRepeatable';
 import _set from 'lodash/set';
 
 export default {
-  mixins: [FormField, HandlesValidationErrors, HandlesRepeatable],
+  mixins: [FormField, HandlesValidationErrors, HandlesRepeatable, DependentFormField],
 
   components: { Draggable },
 
@@ -164,6 +169,12 @@ export default {
   },
 
   computed: {
+    extraAttributes() {
+      const attrs = this.currentField.extraAttributes;
+      return {
+        ...attrs,
+      };
+    },
     repeatableValidation() {
       const fields = this.fields;
       const errors = this.errors.errors;
@@ -208,14 +219,14 @@ export default {
     },
 
     canAddRows() {
-      if (!this.field.canAddRows) return false;
-      if (!!this.field.maxRows) return this.rows.length < this.field.maxRows;
+      if (!this.currentField.canAddRows) return false;
+      if (!!this.currentField.maxRows) return this.rows.length < this.currentField.maxRows;
       return true;
     },
 
     canDeleteRows() {
-      if (!this.field.canDeleteRows) return false;
-      if (!!this.field.minRows) return this.rows.length > this.field.minRows;
+      if (!this.currentField.canDeleteRows) return false;
+      if (!!this.currentField.minRows) return this.rows.length > this.currentField.minRows;
       return true;
     },
   },

@@ -36,8 +36,8 @@ export default {
   methods: {
     setInitialValue() {
       // Initialize minimum amount of rows
-      if (this.field.minRows && !isNaN(this.field.minRows)) {
-        while (this.rows.length < this.field.minRows) this.addRow();
+      if (this.currentField.minRows && !isNaN(this.currentField.minRows)) {
+        while (this.rows.length < this.currentField.minRows) this.addRow();
       }
     },
 

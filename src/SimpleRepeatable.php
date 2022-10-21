@@ -8,13 +8,14 @@ use Laravel\Nova\Fields\Field;
 use Illuminate\Support\Collection;
 use Laravel\Nova\PerformsValidation;
 use Laravel\Nova\Fields\FieldCollection;
+use Laravel\Nova\Fields\SupportsDependentFields;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use ReflectionMethod;
 
 class SimpleRepeatable extends Field
 {
-    use PerformsValidation;
+    use PerformsValidation, SupportsDependentFields;
 
     public $component = 'simple-repeatable';
 
