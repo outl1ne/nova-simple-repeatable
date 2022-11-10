@@ -98,7 +98,7 @@ class SimpleRepeatable extends Field
             Validator::make([$this->attribute => $value], $rules)->validate();
         }
 
-        parent::fill($request, $model);
+        return parent::fill($request, $model);
     }
 
     protected function getFormattedRules(NovaRequest $request)
