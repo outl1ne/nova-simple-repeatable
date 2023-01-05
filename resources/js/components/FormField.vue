@@ -182,8 +182,6 @@ export default {
     },
 
     selectPage(page) {
-      console.log('selected page', page);
-      console.log(this.getFieldAttributeChangeEventName('current_override_prices_page'));
       Nova.$emit(this.getFieldAttributeChangeEventName('current_override_prices_page'), page);
     },
   },
