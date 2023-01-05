@@ -21,14 +21,16 @@ export default {
     },
 
     resultCountLabel() {
-      const first = this.perPage * (this.currentPage - 1);
+      if (!this.currentPageCount) {
+        return null;
+      }
 
-      return (
-        this.currentPageCount &&
-        `${Nova.formatNumber(first + 1)}-${Nova.formatNumber(first + this.currentPageCount)} ${this.__(
-          'of'
-        )} ${Nova.formatNumber(this.totalPages)}`
-      );
+      const first = this.perPage * (this.currentPage - 1);
+      const from = Nova.formatNumber(first + 1);
+      const to = Nova.formatNumber(first + this.currentPageCount);
+      const total = Nova.formatNumber(this.currentField.totalCount);
+
+      return `${from}-${to} ${this.__('of')} ${total}`
     },
   },
 };
