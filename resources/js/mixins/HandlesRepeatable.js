@@ -7,7 +7,7 @@ export default {
   },
 
   mounted() {
-    this.rows = this.field.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex));
+    this.createRows(this.field);
 
     // Listen to active locales (nova-translatable support)
     (this.field.fields || []).forEach((field, i) => {
@@ -34,6 +34,18 @@ export default {
   },
 
   methods: {
+    onSyncedField() {
+      this.createRows(this.currentField);
+
+      // This is currently required to re-enable pagination links.
+      // If this becomes a problem we might need to create our own pagination component.
+      Nova.$emit('resources-loaded');
+    },
+
+    createRows() {
+      this.rows = this.currentField.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex));
+    },
+
     setInitialValue() {
       // Initialize minimum amount of rows
       if (this.currentField.minRows && !isNaN(this.currentField.minRows)) {

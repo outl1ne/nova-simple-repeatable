@@ -15,7 +15,9 @@ use ReflectionMethod;
 
 class SimpleRepeatable extends Field
 {
-    use PerformsValidation, SupportsDependentFields;
+    use PerformsValidation;
+    use SupportsDependentFields;
+    use HasPagination;
 
     public $component = 'simple-repeatable';
 
@@ -168,10 +170,19 @@ class SimpleRepeatable extends Field
      * @param string $attribute
      * @return Illuminate\Support\Collection
      */
-    public function buildRows($resource, $attribute)
+    public function buildRows($resource, $attribute): Collection
     {
         $value = $this->extractValueFromResource($resource, $attribute);
-        return collect($value)->map(function ($rowValue) {
+        $value = collect($value);
+
+        if ($this->isPaginated()) {
+            // Previous actions are usually quite fast,
+            // going forward we'll use paginated results.
+            $this->setTotalCount($value->count());
+            $value = $value->forPage($this->currentPage, $this->perPage);
+        }
+
+        return $value->map(function ($rowValue) {
             return Row::make($this->fields, (array) $rowValue);
         })->filter()->values();
     }

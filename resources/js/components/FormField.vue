@@ -89,6 +89,19 @@
           {{ field.addRowLabel }}
         </DefaultButton>
       </div>
+
+      <component
+        v-if="isPaginated"
+        class="dark:nsr-border-slate-600 rounded-lg nsr-border"
+        is="pagination-links"
+        @page="selectPage"
+        :pages="totalPages"
+        :page="currentPage"
+      >
+        <span class="text-xs px-4 ml-auto">
+          {{ resultCountLabel }}
+        </span>
+      </component>
     </template>
   </DefaultField>
 </template>
@@ -98,10 +111,11 @@ import Draggable from 'vuedraggable';
 import { Errors } from 'form-backend-validation';
 import { FormField, HandlesValidationErrors, DependentFormField } from 'laravel-nova';
 import HandlesRepeatable from '../mixins/HandlesRepeatable';
+import PaginateRepeatable from '../mixins/PaginateRepeatable';
 import _set from 'lodash/set';
 
 export default {
-  mixins: [FormField, HandlesValidationErrors, HandlesRepeatable, DependentFormField],
+  mixins: [FormField, HandlesValidationErrors, DependentFormField, HandlesRepeatable, PaginateRepeatable],
 
   components: { Draggable },
 
@@ -165,6 +179,12 @@ export default {
 
     deleteRow(index) {
       this.rows.splice(index, 1);
+    },
+
+    selectPage(page) {
+      console.log('selected page', page);
+      console.log(this.getFieldAttributeChangeEventName('current_override_prices_page'));
+      Nova.$emit(this.getFieldAttributeChangeEventName('current_override_prices_page'), page);
     },
   },
 
@@ -243,9 +263,9 @@ export default {
         padding-top: 0 !important;
       }
 
-      > *,
-        // Improve compatibility with nova-translatable
-      .translatable-field > div:not(:first-child) > div {
+      >*,
+      // Improve compatibility with nova-translatable
+      .translatable-field>div:not(:first-child)>div {
         flex: 1;
         flex-shrink: 0;
         min-width: 0;
