@@ -48,10 +48,10 @@ trait HasPagination
                 $field->setCurrentPage($currentPage);
                 $field->rows = $field->buildRows($field->resource, $field->attribute);
                 $field->rows->each->resolve();
-                $field->withMeta(['rows' => $field->rows]);
             }
 
             $field->withMeta([
+                'rows' => $field->rows,
                 'perPage' => $field->perPage,
                 'currentPage' => $field->currentPage,
                 'currentPageCount' => count($field->rows),

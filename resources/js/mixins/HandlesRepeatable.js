@@ -43,7 +43,7 @@ export default {
     },
 
     createRows() {
-      this.rows = this.currentField.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex));
+      this.rows = this.currentField.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex * this.currentPage));
     },
 
     setInitialValue() {
