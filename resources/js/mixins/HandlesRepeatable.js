@@ -1,7 +1,7 @@
 export default {
   data() {
     return {
-      rows: [],
+      rows: {},
       activeLocales: {},
     };
   },
@@ -19,7 +19,7 @@ export default {
       const eventName = this.getAllLocalesEventName(id);
       Nova.$on(eventName, locale => {
         this.activeLocales = {
-          ...this.activeLocales,
+          ...this.activeLocaqules,
           [i]: locale,
         };
       });
@@ -43,7 +43,10 @@ export default {
     },
 
     createRows() {
-      this.rows = this.currentField.rows.map((row, rowIndex) => this.copyFields(row.fields, rowIndex * this.currentPage));
+      this.rows = this.currentField.rows.map((row, idx) => {
+        const index = this.currentPage > 1 ? idx + (this.perPage * (this.currentPage - 1)) : idx;
+        return this.copyFields(row.fields, index);
+      });
     },
 
     setInitialValue() {
