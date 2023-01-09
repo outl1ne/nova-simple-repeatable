@@ -45,7 +45,7 @@ export default {
     createRows() {
       this.rows = this.currentField.rows.map((row, idx) => {
         const index = this.currentPage > 1 ? idx + (this.perPage * (this.currentPage - 1)) : idx;
-        return this.copyFields(row.fields, index);
+        return this.copyFields(row.fields, index.toString());
       });
     },
 
