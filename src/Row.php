@@ -65,7 +65,7 @@ class Row implements JsonSerializable
         return $field;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'fields' => $this->fields->jsonSerialize(),
