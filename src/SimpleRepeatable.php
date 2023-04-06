@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Validator;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use ReflectionMethod;
 
+/**
+ * @method static static make(mixed $name, string|\Closure|callable|object|null $attribute = null, array|null $fields = null)
+ */
 class SimpleRepeatable extends Field
 {
     use PerformsValidation, SupportsDependentFields;
