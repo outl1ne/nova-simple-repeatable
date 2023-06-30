@@ -15,8 +15,11 @@
             class="nsr-font-bold nsr-text-90 nsr-text-md nsr-w-full nsr-ml-3 nsr-flex"
           >
             {{ rowField.name }}
+            <span v-if="rowField.required" class="nsr-text-red-500 nsr-text-sm nsr-pl-1">
+              {{ __('*') }}
+            </span>
 
-            <!--  If field is nova-translatable, render seperate locale-tabs   -->
+            <!--  If field is nova-translatable, render separate locale-tabs   -->
             <nova-translatable-locale-tabs
               style="padding: 0"
               class="nsr-ml-auto"
