@@ -78,12 +78,6 @@ class SimpleRepeatable extends Field
     protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
         $value = $request->input($requestAttribute) ?? null;
-        $value = json_decode($value, true);
-
-        // Do validation
-        $rules = $this->getFormattedRules($request);
-        Validator::make([$this->attribute => $value], $rules)->validate();
-
         $model->{$attribute} = $value;
     }
 
@@ -91,7 +85,6 @@ class SimpleRepeatable extends Field
     {
         if (get_class($model) === 'Whitecube\NovaFlexibleContent\Layouts\Layout') {
             $value = $request->input($this->attribute) ?? null;
-            $value = json_decode($value, true);
 
             // Do validation
             if ($request->resourceId) $this->resource = $request->findModelOrFail();
@@ -106,8 +99,16 @@ class SimpleRepeatable extends Field
         parent::fill($request, $model);
     }
 
+    public function getUpdateRules(NovaRequest $request)
+    {
+        return array_merge($this->getFormattedRules($request), [
+            $this->attribute => [], // No rules for the main attribute but without it Laravel throws exception
+        ]);
+    }
+
     protected function getFormattedRules(NovaRequest $request)
     {
+        // Get rules from nested fields
         $rules = static::formatRules(
             $request,
             collect($this->fields)->reject(function ($field) use ($request) {

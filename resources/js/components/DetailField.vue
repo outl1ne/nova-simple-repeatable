@@ -82,7 +82,7 @@ export default {
           valuesArray = valuesArray.map(entry => {
             const id = entry[field.attribute];
 
-            if (!!id) {
+            if (id) {
               // Try the usual label-value pair
               if (field.options[0].value && field.options[0].label) {
                 // Yay, we recognize this format
@@ -91,7 +91,7 @@ export default {
               }
 
               // Also try the key-value pair format
-              else if (!!field.options[id]) {
+              else if (field.options[id]) {
                 entry[field.attribute] = field.options[id];
               }
             }
