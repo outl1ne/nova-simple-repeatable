@@ -99,7 +99,7 @@ class SimpleRepeatable extends Field
         parent::fill($request, $model);
     }
 
-    public function getUpdateRules(NovaRequest $request)
+    public function getRules(NovaRequest $request)
     {
         return array_merge($this->getFormattedRules($request), [
             $this->attribute => [], // No rules for the main attribute but without it Laravel throws exception

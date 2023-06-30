@@ -196,12 +196,11 @@ export default {
     repeatableValidation() {
       const fields = this.fields;
       const errors = this.errors.errors;
-      const repeaterAttr = this.field.attribute;
-      const safeRepeaterAttr = this.field.attribute.replace(/.{16}__/, '');
+      const safeRepeaterAttr = this.field.validationKey.replace(/.{16}__/, '');
       const erroredFieldLocales = {};
       const formattedKeyErrors = {};
 
-      // Find errored locales
+      // Find errored fields
       for (const field of fields) {
         const fieldAttr = field.originalAttribute;
 
@@ -216,16 +215,9 @@ export default {
           erroredFieldLocales[fieldAttr] = foundLocales;
         }
 
-        // Format field
+        // Parse error key name to match with field input name
         relatedErrors.forEach(errorKey => {
-          const rowIndex = errorKey.split('.')[1];
-          let uniqueKey = `${repeaterAttr}---${field.originalAttribute}---${rowIndex}`;
-
-          if (isTranslatable) {
-            const locale = errorKey.split('.').slice(-1)[0];
-            uniqueKey = `${uniqueKey}.${locale}`;
-          }
-
+          const uniqueKey = this.getValidationKey(field, errorKey, isTranslatable);
           formattedKeyErrors[uniqueKey] = errors[errorKey];
         });
       }
