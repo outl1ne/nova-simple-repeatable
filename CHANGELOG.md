@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 03-07-2023
+
+### Added
+
+- Return type annotations for some methods that are now required by Nova.
+
+### Changed
+
+- Format that data is sent to Nova is now FormData instead of JSON.
+
+### Fixed
+
+- Fixed sorting of locales present for field inside repeater.
+- Fixed unique attribute names to match validation errors returned by Nova.
+- Fixed asterisk display for required fields.
+
 ## [2.1.0] - 21-07-2022
 
 ### Added
