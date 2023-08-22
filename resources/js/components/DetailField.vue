@@ -21,7 +21,6 @@
             >
               <td
                 class="nsr-font-mono nsr-text-sm simple-repeatable-detail-field-wrapper"
-                style="height: 2rem"
                 v-for="(rowField, j) in row.fields"
                 :key="j"
               >
