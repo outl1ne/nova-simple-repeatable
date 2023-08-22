@@ -8,7 +8,9 @@
         <table class="nsr-table nsr-w-full nsr-table-default nova-resource-table">
           <thead>
             <tr class="nsr-border-b nsr-border-slate-200 dark:nsr-border-slate-600">
-              <th v-for="(header, i) in headers" :key="i">{{ header.name }}</th>
+              <template v-for="(header, i) in headers" :key="i">
+                <th v-if="header.name && header.name.length">{{ header.name }}</th>
+              </template>
             </tr>
           </thead>
           <tbody>
