@@ -18,6 +18,7 @@
               v-for="(row, i) of field.rows"
               :key="i"
               class="simple-repeatable-table-row odd:nsr-bg-slate-50 hover:nsr-bg-slate-100 dark:odd:nsr-bg-slate-700 dark:hover:nsr-bg-slate-600"
+              :class="{ 'flex flex-col': field.colsPerRow }"
             >
               <td
                 class="nsr-font-mono nsr-text-sm simple-repeatable-detail-field-wrapper"

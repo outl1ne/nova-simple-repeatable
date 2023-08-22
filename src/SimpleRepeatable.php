@@ -66,6 +66,11 @@ class SimpleRepeatable extends Field
         return $this->withMeta(['addRowLabel' => $label]);
     }
 
+    public function colsPerRow($colsPerRow = false)
+    {
+        return $this->withMeta(['colsPerRow' => $colsPerRow]);
+    }
+
     /**
      *
      * Validate and hydrate the given attribute on the model based on the incoming request.
