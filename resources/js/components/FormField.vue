@@ -49,7 +49,8 @@
                 </svg>
               </div>
 
-              <div class="simple-repeatable-fields-wrapper nsr-w-full nsr-flex">
+              <div class="simple-repeatable-fields-wrapper nsr-w-full nsr-flex"
+                   :class="{ 'flex-col': field.colsPerRow }">
                 <component
                   v-for="(rowField, j) in element"
                   :key="j"
@@ -57,6 +58,7 @@
                   :field="rowField"
                   :errors="repeatableValidation.errors"
                   :unique-id="getUniqueId(field, rowField)"
+                  :class="{ '!nsr-ml-0 !nsr-mb-3 last:nsr-mb-0': field.colsPerRow }"
                   class="nsr-mr-3"
                 />
               </div>

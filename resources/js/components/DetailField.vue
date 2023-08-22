@@ -8,7 +8,9 @@
         <table class="nsr-table nsr-w-full nsr-table-default nova-resource-table">
           <thead>
             <tr class="nsr-border-b nsr-border-slate-200 dark:nsr-border-slate-600">
-              <th v-for="(header, i) in headers" :key="i">{{ header.name }}</th>
+              <template v-for="(header, i) in headers" :key="i">
+                <th v-if="header.name && header.name.length">{{ header.name }}</th>
+              </template>
             </tr>
           </thead>
           <tbody>
@@ -16,10 +18,10 @@
               v-for="(row, i) of field.rows"
               :key="i"
               class="simple-repeatable-table-row odd:nsr-bg-slate-50 hover:nsr-bg-slate-100 dark:odd:nsr-bg-slate-700 dark:hover:nsr-bg-slate-600"
+              :class="{ 'flex flex-col': field.colsPerRow }"
             >
               <td
                 class="nsr-font-mono nsr-text-sm simple-repeatable-detail-field-wrapper"
-                style="height: 2rem"
                 v-for="(rowField, j) in row.fields"
                 :key="j"
               >
