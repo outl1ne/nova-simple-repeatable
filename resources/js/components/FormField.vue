@@ -177,7 +177,11 @@ export default {
         allValues.push(rowValues);
       }
 
-      this.objectToFormData(allValues, formData, this.field.attribute);
+      if (this.field.convertFormDataToJson) {
+        formData.append(this.field.attribute, JSON.stringify(allValues));
+      } else {
+        this.objectToFormData(allValues, formData, this.field.attribute);
+      }
     },
 
     addRow() {

@@ -66,6 +66,21 @@ class SimpleRepeatable extends Field
         return $this->withMeta(['addRowLabel' => $label]);
     }
 
+    /*
+     * Transforms repeater values to JSON instead FormData.
+     * Used in cases when you have thousands of rows and you want to avoid max input vars defined in php conf.
+     */
+    public function json()
+    {
+        return $this->withMeta(['convertFormDataToJson' => true]);
+    }
+
+    protected function isJson()
+    {
+        if (empty($this->meta['convertFormDataToJson'])) return false;
+        return $this->meta['convertFormDataToJson'];
+    }
+
     /**
      *
      * Validate and hydrate the given attribute on the model based on the incoming request.
@@ -77,7 +92,23 @@ class SimpleRepeatable extends Field
      */
     protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
     {
+        if ($this->isJson()) {
+            $this->fillAttributeFromJsonRequest($request, $requestAttribute, $model, $attribute);
+        } else {
+            $value = $request->input($requestAttribute) ?? null;
+            $model->{$attribute} = $value;
+        }
+    }
+
+    protected function fillAttributeFromJsonRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
+    {
         $value = $request->input($requestAttribute) ?? null;
+        $value = json_decode($value, true);
+
+        // Do validation
+        $rules = $this->getFormattedRules($request);
+        Validator::make([$this->attribute => $value], $rules)->validate();
+
         $model->{$attribute} = $value;
     }
 
@@ -85,6 +116,7 @@ class SimpleRepeatable extends Field
     {
         if (get_class($model) === 'Whitecube\NovaFlexibleContent\Layouts\Layout') {
             $value = $request->input($this->attribute) ?? null;
+            if ($this->isJson()) $value = json_decode($value, true);
 
             // Do validation
             if ($request->resourceId) $this->resource = $request->findModelOrFail();
