@@ -90,14 +90,17 @@ export default {
       return id !== void 0 ? `nova-translatable-${id}@setAllLocale` : 'nova-translatable@setAllLocale';
     },
 
-    getValidationKey(field, errorKey, translatable = false) {
+    getValidationKey(row, errorKey, translatable = false) {
       const errorKeyParts = errorKey.split('.');
+      let errorFieldName = errorKeyParts[errorKeyParts.length - 1]
+      if (translatable) errorFieldName = errorKeyParts[errorKeyParts.length - 2]
+      const field = row.find(({attribute}) => {
+        const fieldKeyParts = attribute.split('---')
+        const fieldName = fieldKeyParts[1]
+        return fieldName === errorFieldName
+      })
 
-      // Index position in string
-      const indexOffset = translatable ? 3 : 2;
-      let rowIndex = errorKeyParts[errorKeyParts.length - indexOffset];
-      let uniqueKey = `${this.field.validationKey}---${field.originalAttribute}---${rowIndex}`;
-
+      let uniqueKey = field.attribute;
       if (translatable) {
         const locale = errorKeyParts[errorKeyParts.length - 1];
         uniqueKey += `.${locale}`;

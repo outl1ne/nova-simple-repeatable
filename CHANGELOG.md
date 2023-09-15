@@ -6,12 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [2.2.1] - 15-09-2023
+## [2.2.2] - 15-09-2023
 
 ### Added
 
 - `json()` method to field that allows sending data in JSON format instead FormData.
 
+### Fixed
+
+- Validation error display when one or more rows were deleted. [Issue description](https://github.com/outl1ne/nova-simple-repeatable/issues/52)
 
 ## [2.2.0] - 03-07-2023
 

@@ -223,8 +223,8 @@ export default {
         }
 
         // Parse error key name to match with field input name
-        relatedErrors.forEach(errorKey => {
-          const uniqueKey = this.getValidationKey(field, errorKey, isTranslatable);
+        relatedErrors.forEach((errorKey, rowIndex) => {
+          const uniqueKey = this.getValidationKey(this.rows[rowIndex], errorKey, isTranslatable);
           formattedKeyErrors[uniqueKey] = errors[errorKey];
         });
       }
