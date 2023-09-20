@@ -1,19 +1,20 @@
 import DetailField from './components/DetailField';
 import FormField from './components/FormField';
 
-let simpleRepeatableDarkModeObserver = null;
+const handleDarkMode = () => {
+  const cls = document.documentElement.classList;
+  const isDarkMode = cls.contains('dark');
+
+  if (isDarkMode && !cls.contains('o1-dark')) {
+    cls.add('o1-dark');
+  } else if (!isDarkMode && cls.contains('o1-dark')) {
+    cls.remove('o1-dark');
+  }
+};
 
 Nova.booting((Vue, store) => {
-  simpleRepeatableDarkModeObserver = new MutationObserver(() => {
-    const cls = document.documentElement.classList;
-    const isDarkMode = cls.contains('dark');
-
-    if (isDarkMode && !cls.contains('nsr-dark')) {
-      cls.add('nsr-dark');
-    } else if (!isDarkMode && cls.contains('nsr-dark')) {
-      cls.remove('nsr-dark');
-    }
-  }).observe(document.documentElement, {
+  handleDarkMode();
+  new MutationObserver(handleDarkMode).observe(document.documentElement, {
     attributes: true,
     attributeOldValue: true,
     attributeFilter: ['class'],
