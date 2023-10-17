@@ -177,11 +177,7 @@ export default {
         allValues.push(rowValues);
       }
 
-      if (this.field.convertFormDataToJson) {
-        formData.append(this.field.attribute, JSON.stringify(allValues));
-      } else {
-        this.objectToFormData(allValues, formData, this.field.attribute);
-      }
+      this.objectToFormData(allValues, formData, this.field.attribute);
     },
 
     addRow() {
@@ -203,11 +199,12 @@ export default {
     repeatableValidation() {
       const fields = this.fields;
       const errors = this.errors.errors;
-      const safeRepeaterAttr = this.field.validationKey.replace(/.{16}__/, '');
+      const repeaterAttr = this.field.attribute;
+      const safeRepeaterAttr = this.field.attribute.replace(/.{16}__/, '');
       const erroredFieldLocales = {};
       const formattedKeyErrors = {};
 
-      // Find errored fields
+      // Find errored locales
       for (const field of fields) {
         const fieldAttr = field.originalAttribute;
 
@@ -222,9 +219,16 @@ export default {
           erroredFieldLocales[fieldAttr] = foundLocales;
         }
 
-        // Parse error key name to match with field input name
-        relatedErrors.forEach((errorKey, rowIndex) => {
-          const uniqueKey = this.getValidationKey(this.rows[rowIndex], errorKey, isTranslatable);
+        // Format field
+        relatedErrors.forEach(errorKey => {
+          const rowIndex = errorKey.split('.')[1];
+          let uniqueKey = `${repeaterAttr}---${field.originalAttribute}---${rowIndex}`;
+
+          if (isTranslatable) {
+            const locale = errorKey.split('.').slice(-1)[0];
+            uniqueKey = `${uniqueKey}.${locale}`;
+          }
+
           formattedKeyErrors[uniqueKey] = errors[errorKey];
         });
       }

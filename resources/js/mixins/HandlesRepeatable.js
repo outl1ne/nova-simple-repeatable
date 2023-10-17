@@ -46,7 +46,7 @@ export default {
 
       // Return an array of fields with unique attribute
       return fields.map(field => {
-        const uniqueAttribute = `${this.field.validationKey}---${field.attribute}---${rowIndex}`;
+        const uniqueAttribute = `${this.field.attribute}---${field.attribute}---${rowIndex}`;
 
         let formattedLocales = null;
         if (field.component === 'translatable-field') {
@@ -88,25 +88,6 @@ export default {
     getAllLocalesEventName(uniqueId) {
       const id = uniqueId ?? void 0;
       return id !== void 0 ? `nova-translatable-${id}@setAllLocale` : 'nova-translatable@setAllLocale';
-    },
-
-    getValidationKey(row, errorKey, translatable = false) {
-      const errorKeyParts = errorKey.split('.');
-      let errorFieldName = errorKeyParts[errorKeyParts.length - 1]
-      if (translatable) errorFieldName = errorKeyParts[errorKeyParts.length - 2]
-      const field = row.find(({attribute}) => {
-        const fieldKeyParts = attribute.split('---')
-        const fieldName = fieldKeyParts[1]
-        return fieldName === errorFieldName
-      })
-
-      let uniqueKey = field.attribute;
-      if (translatable) {
-        const locale = errorKeyParts[errorKeyParts.length - 1];
-        uniqueKey += `.${locale}`;
-      }
-
-      return uniqueKey;
     },
 
     getUniqueId(field, rowField) {
