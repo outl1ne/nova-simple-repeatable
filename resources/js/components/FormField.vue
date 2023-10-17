@@ -111,24 +111,6 @@ export default {
   props: ['resourceName', 'resourceId', 'field'],
 
   methods: {
-    // Converts nested object to FormData
-    objectToFormData(obj, formData, namespace) {
-      formData = formData || new FormData();
-      let formKey;
-
-      for (const fieldName in obj) {
-        formKey = namespace + '[' + fieldName + ']';
-
-        if (typeof obj[fieldName] === 'object') {
-          this.objectToFormData(obj[fieldName], formData, formKey);
-        } else {
-          formData.append(formKey, obj[fieldName]);
-        }
-      }
-
-      return formData;
-    },
-
     fill(formData) {
       const ARR_REGEX = () => /\[\d+\]$/g;
 
@@ -177,7 +159,7 @@ export default {
         allValues.push(rowValues);
       }
 
-      this.objectToFormData(allValues, formData, this.field.attribute);
+      formData.append(this.field.attribute, JSON.stringify(allValues));
     },
 
     addRow() {
@@ -241,13 +223,13 @@ export default {
 
     canAddRows() {
       if (!this.currentField.canAddRows) return false;
-      if (this.currentField.maxRows) return this.rows.length < this.currentField.maxRows;
+      if (!!this.currentField.maxRows) return this.rows.length < this.currentField.maxRows;
       return true;
     },
 
     canDeleteRows() {
       if (!this.currentField.canDeleteRows) return false;
-      if (this.currentField.minRows) return this.rows.length > this.currentField.minRows;
+      if (!!this.currentField.minRows) return this.rows.length > this.currentField.minRows;
       return true;
     },
   },
