@@ -13,6 +13,7 @@
             v-for="(rowField, i) in fields"
             :key="i"
             class="o1-font-bold o1-text-90 o1-text-md o1-w-full o1-ml-3 o1-flex"
+            :style="{ maxWidth: rowField.nsrWidth || null }"
           >
             {{ rowField.name }}
             <span v-if="rowField.required" class="o1-text-red-500 o1-text-sm o1-pl-1">
@@ -58,6 +59,7 @@
                   :errors="repeatableValidation.errors"
                   :unique-id="getUniqueId(field, rowField)"
                   class="o1-mr-3"
+                  :style="{ maxWidth: rowField.nsrWidth || null }"
                 />
               </div>
 
