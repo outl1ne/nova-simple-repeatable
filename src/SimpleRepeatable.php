@@ -41,6 +41,11 @@ class SimpleRepeatable extends Field
         $this->fields = FieldCollection::make($fields);
     }
 
+    public function getFields()
+    {
+        return $this->fields;
+    }
+
     public function minRows($minRows = null)
     {
         return $this->withMeta(['minRows' => $minRows]);
