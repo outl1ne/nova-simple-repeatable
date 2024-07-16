@@ -60,6 +60,7 @@
                   :unique-id="getUniqueId(field, rowField)"
                   class="o1-mr-3"
                   :style="{ maxWidth: rowField.nsrWidth || null }"
+                  :resource-name="this.resourceName"
                 />
               </div>
 
