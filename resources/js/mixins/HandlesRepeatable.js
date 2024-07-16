@@ -55,12 +55,45 @@ export default {
 
         return {
           ...field,
+          dependsOn: this.transformDependsOn(field.dependsOn, rowIndex),
           originalAttribute: field.attribute,
           validationKey: uniqueAttribute,
           attribute: uniqueAttribute,
           formattedLocales,
         };
       });
+    },
+
+    transformDependsOn(obj, rowIndex) {
+      if (!obj || typeof obj !== 'object') {
+        return obj;
+      }
+
+      let transformedObj = {};
+
+      Object.keys(obj).forEach(key => {
+        let transformedKey = this.transformDependsOnString(key, rowIndex);
+        transformedObj[transformedKey] = obj[key];
+      });
+
+      return transformedObj;
+    },
+
+
+    // Take backend (dot) format of dependsOn and format for frontend (triple dash)
+    transformDependsOnString(inputString, rowIndex) {
+      if (!inputString) {
+        return null;
+      }
+
+      if (!inputString.includes('.')) {
+        return inputString;
+      }
+
+      let transformedString = inputString.replace(/\./g, '---');
+      transformedString += `---${rowIndex}`;
+
+      return transformedString;
     },
 
     getFieldLocales(field) {
