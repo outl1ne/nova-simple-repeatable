@@ -79,7 +79,6 @@ export default {
       return transformedObj;
     },
 
-
     // Take backend (dot) format of dependsOn and format for frontend (triple dash)
     transformDependsOnString(inputString, rowIndex) {
       if (!inputString) {
