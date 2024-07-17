@@ -86,17 +86,8 @@ trait DependsOnSiblings
                 $childField->attribute = "$parentAttribute---{$childField->attribute}---$elementNumber";
                 $siblings[] = $childField;
 
-                // Prepare dot-notation backend key to be available through request
-                $setAttribute = "$parentAttribute.$triggerAttribute";
-                $value = $request->get($childField->attribute);
-                $request->query->set($setAttribute, $value);
-
-                if ($childField->attribute === $affectedField) {
-                    // Need to replace original component in the query since we changed the original attribute
-                    // as we can't change it afterward without overriding Nova routes & controllers which
-                    // seemed like an unnecessary complexity.
-                    $request->query->set('component', $childField->dependentComponentKey());
-                }
+                $this->setAffected($childField, $affectedField, $request);
+                $this->setTrigger($childField, $triggerField, $parentAttribute, $triggerAttribute, $request);
             }
         }
 
@@ -120,5 +111,46 @@ trait DependsOnSiblings
     protected function extractFieldAttribute(string $field): string
     {
         return Str::betweenFirst($field, $this->frontendSeparator, $this->frontendSeparator);
+    }
+
+    /**
+     * Need to replace original component in the query since we changed the original attribute
+     * as we can't change it afterward without overriding Nova routes & controllers which
+     * seemed like an unnecessary complexity.
+     *
+     * @param Field $childField
+     * @param mixed $affectedField
+     * @param NovaRequest $request
+     * @return void
+     */
+    protected function setAffected(Field $childField, string $affectedField, NovaRequest $request): void
+    {
+        if ($childField->attribute === $affectedField) {
+            $request->query->set('component', $childField->dependentComponentKey());
+        }
+    }
+
+    /**
+     * When we encounter a trigger field, we need to make sure to extract value it is providing for the
+     * dependent field, and attach it to the request in the same format as expected on the backend
+     *
+     * @param Field $childField
+     * @param string $triggerField
+     * @param string $parentAttribute
+     * @param string $triggerAttribute
+     * @param NovaRequest $request
+     * @return void
+     */
+    protected function setTrigger(Field $childField, string $triggerField, string $parentAttribute, string $triggerAttribute, NovaRequest $request): void
+    {
+        if ($childField->attribute !== $triggerField) {
+            return;
+        }
+
+        // Prepare dot-notation backend key to be available through request
+        $setAttribute = "$parentAttribute.$triggerAttribute";
+        $value = $request->get($childField->attribute);
+
+        $request->query->set($setAttribute, $value);
     }
 }
