@@ -64,12 +64,22 @@ Example:
 
 ```php
 SimpleRepeatable::make('Adding', 'parent', [
-
+    // Depending on 1 field
     Text::make('Child'),
+    Text::make('Dependent Child')
+      ->dependsOn('parent.child', function ($field, NovaRequest $request, FormData $formData) {
+          $attribute = $request->get('parent.child');
+      }),
 
-    Text::make('Dependent Child')->dependsOn('parent.child', function ($field, NovaRequest $request, FormData $formData) {
-        $attribute = $request->get('parent.child');
-    }),
+    // Depending on multiple fields
+    Text::make('Second Child'),
+    Text::make('Third Child'),
+    Text::make('Really Dependent Child')
+      ->dependsOn(['parent.second_child', 'parent.third_child'], function ($field, NovaRequest $request, FormData $formData) {
+          $attribute1 = $request->get('parent.second_child');
+          $attribute2 = $request->get('parent.third_child');
+      }),
+
 ])
 ```
 

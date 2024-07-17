@@ -63,8 +63,7 @@ trait DependsOnSiblings
         $affectedField = $request->get('field');
         $elementNumber = Str::afterLast($affectedField, '-');
 
-        $triggerField = $this->getTriggerField($request, $affectedField);
-        $triggerAttribute = $this->extractFieldAttribute($triggerField);
+        $triggerFields = $this->getTriggerFields($request, $affectedField);
 
         // Prevent entering if dependsOn is triggered by outer fields
         if (!str_contains($affectedField, $this->frontendSeparator)) {
@@ -87,14 +86,14 @@ trait DependsOnSiblings
                 $siblings[] = $childField;
 
                 $this->setAffected($childField, $affectedField, $request);
-                $this->setTrigger($childField, $triggerField, $parentAttribute, $triggerAttribute, $request);
+                $this->setTrigger($childField, $triggerFields, $parentAttribute, $request);
             }
         }
 
         return $siblings;
     }
 
-    protected function getTriggerField(NovaRequest $request, mixed $affectedField): ?string
+    protected function getTriggerFields(NovaRequest $request, mixed $affectedField): array
     {
         // Fetching input without query string parameters
         $input = $request->json()->all();
@@ -104,8 +103,7 @@ trait DependsOnSiblings
             return $key !== $affectedField;
         }, ARRAY_FILTER_USE_BOTH);
 
-        // Return the key of the first entry in the filtered array
-        return array_key_first($filteredInputs);
+        return array_keys($filteredInputs);
     }
 
     protected function extractFieldAttribute(string $field): string
@@ -135,21 +133,24 @@ trait DependsOnSiblings
      * dependent field, and attach it to the request in the same format as expected on the backend
      *
      * @param Field $childField
-     * @param string $triggerField
+     * @param array $triggerFields
      * @param string $parentAttribute
-     * @param string $triggerAttribute
      * @param NovaRequest $request
      * @return void
      */
-    protected function setTrigger(Field $childField, string $triggerField, string $parentAttribute, string $triggerAttribute, NovaRequest $request): void
+    protected function setTrigger(Field $childField, array $triggerFields, string $parentAttribute, NovaRequest $request): void
     {
-        if ($childField->attribute !== $triggerField) {
+        if (!in_array($childField->attribute, $triggerFields)) {
             return;
         }
+
+        $triggerAttribute = $this->extractFieldAttribute($childField->attribute);
 
         // Prepare dot-notation backend key to be available through request
         $setAttribute = "$parentAttribute.$triggerAttribute";
         $value = $request->get($childField->attribute);
+
+        \Log::info("Setting $setAttribute to $value");
 
         $request->query->set($setAttribute, $value);
     }
