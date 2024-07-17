@@ -52,6 +52,37 @@ php artisan vendor:publish --provider="Outl1ne\NovaSimpleRepeatable\SimpleRepeat
 
 You can then edit the strings to your liking.
 
+## DependsOn for siblings
+
+``dependsOn()`` function is made available for fields within the `SimpleRepeatable`. To make the feature available, be sure
+to use ``DependsOnSiblings`` trait on the resource you want to have `dependsOn()` available for sibling fields.
+
+Key on which the field depends on is constructed out of two parts: ``{parent attribute}.{child attribute}``. This key
+will be made available to fetch within the function via ``$request->get('parent.child')``.
+
+Example:
+
+```php
+SimpleRepeatable::make('Adding', 'parent', [
+    // Depending on 1 field
+    Text::make('Child'),
+    Text::make('Dependent Child')
+      ->dependsOn('parent.child', function ($field, NovaRequest $request, FormData $formData) {
+          $attribute = $request->get('parent.child');
+      }),
+
+    // Depending on multiple fields
+    Text::make('Second Child'),
+    Text::make('Third Child'),
+    Text::make('Really Dependent Child')
+      ->dependsOn(['parent.second_child', 'parent.third_child'], function ($field, NovaRequest $request, FormData $formData) {
+          $attribute1 = $request->get('parent.second_child');
+          $attribute2 = $request->get('parent.third_child');
+      }),
+
+])
+```
+
 ## Credits
 
 - [Tarvo Reinpalu](https://github.com/tarpsvo)
