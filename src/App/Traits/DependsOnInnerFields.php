@@ -13,6 +13,8 @@ use Outl1ne\NovaSimpleRepeatable\SimpleRepeatable;
 
 trait DependsOnInnerFields
 {
+    protected string $frontendSeparator = '---';
+
     // When to append the merging logic
     protected array $callerClasses = [
         CreationFieldSyncController::class
@@ -57,6 +59,17 @@ trait DependsOnInnerFields
     protected function loadInnerFields(NovaRequest $request): array
     {
         $innerFields = [];
+        // If triggered within SimpleRepeatable, this will come in xxx---xxx---0 format
+        $affectedField = $request->get('field');
+        $elementNumber = Str::afterLast($affectedField, '-');
+
+        $triggerField = $this->getTriggerField($request, $affectedField);
+        $triggerAttribute = $this->extractFieldAttribute($triggerField);
+
+        // Prevent entering if dependsOn is triggered by outer fields
+        if (!str_contains($affectedField, $this->frontendSeparator)) {
+            return $innerFields;
+        }
 
         /** @var Resource $this */
         foreach ($this->fields($request) as $parentField) {
@@ -64,27 +77,48 @@ trait DependsOnInnerFields
                 continue;
             }
 
-            $reqField = $request->get('field');
-            $elementNumber = Str::afterLast($reqField, '-');
-
             $parentAttribute = $parentField->attribute;
 
-            $childFields = $parentField->getFields()->all();
-
             /** @var Field $childField */
-            foreach ($childFields as $childField) {
-
-                $setAttribute = "$parentAttribute.{$childField->attribute}";
+            foreach ($parentField->getFields()->all() as $childField) {
+                // Need to change original attribute to the frontend dashed equivalent so Nova knows which
+                // field will be affected by changing its dependant
                 $childField->attribute = "$parentAttribute---{$childField->attribute}---$elementNumber";
                 $innerFields[] = $childField;
 
+                // Prepare dot-notation backend key to be available through request
+                $setAttribute = "$parentAttribute.$triggerAttribute";
                 $value = $request->get($childField->attribute);
-
                 $request->query->set($setAttribute, $value);
-                $request->query->set('component', $childField->dependentComponentKey());
+
+                if ($childField->attribute === $affectedField) {
+                    // Need to replace original component in the query since we changed the original attribute
+                    // as we can't change it afterward without overriding Nova routes & controllers which
+                    // seemed like an unnecessary complexity.
+                    $request->query->set('component', $childField->dependentComponentKey());
+                }
             }
         }
 
         return $innerFields;
+    }
+
+    protected function getTriggerField(NovaRequest $request, mixed $affectedField): ?string
+    {
+        // Fetching input without query string parameters
+        $input = $request->json()->all();
+
+        // Filter out the specific field
+        $filteredInputs = array_filter($input, function ($value, $key) use ($affectedField) {
+            return $key !== $affectedField;
+        }, ARRAY_FILTER_USE_BOTH);
+
+        // Return the key of the first entry in the filtered array
+        return array_key_first($filteredInputs);
+    }
+
+    protected function extractFieldAttribute(string $field): string
+    {
+        return Str::betweenFirst($field, $this->frontendSeparator, $this->frontendSeparator);
     }
 }
