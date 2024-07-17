@@ -11,7 +11,7 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Resource;
 use Outl1ne\NovaSimpleRepeatable\SimpleRepeatable;
 
-trait DependsOnInnerFields
+trait DependsOnSiblings
 {
     protected string $frontendSeparator = '---';
 
@@ -27,8 +27,8 @@ trait DependsOnInnerFields
     {
         $creationFields = parent::creationFields($request);
 
-        return $this->shouldAppendInnerFields()
-            ? $creationFields->merge($this->loadInnerFields($request))
+        return $this->shouldAppendSiblings()
+            ? $creationFields->merge($this->loadSiblings($request))
             : $creationFields;
     }
 
@@ -39,7 +39,7 @@ trait DependsOnInnerFields
      *
      * @return string|null
      */
-    protected function shouldAppendInnerFields(): ?string
+    protected function shouldAppendSiblings(): ?string
     {
         $backtrace = debug_backtrace();
         $classes = Arr::pluck($backtrace, 'class');
@@ -56,9 +56,9 @@ trait DependsOnInnerFields
     /**
      * @throws Exception
      */
-    protected function loadInnerFields(NovaRequest $request): array
+    protected function loadSiblings(NovaRequest $request): array
     {
-        $innerFields = [];
+        $siblings = [];
         // If triggered within SimpleRepeatable, this will come in xxx---xxx---0 format
         $affectedField = $request->get('field');
         $elementNumber = Str::afterLast($affectedField, '-');
@@ -68,7 +68,7 @@ trait DependsOnInnerFields
 
         // Prevent entering if dependsOn is triggered by outer fields
         if (!str_contains($affectedField, $this->frontendSeparator)) {
-            return $innerFields;
+            return $siblings;
         }
 
         /** @var Resource $this */
@@ -84,7 +84,7 @@ trait DependsOnInnerFields
                 // Need to change original attribute to the frontend dashed equivalent so Nova knows which
                 // field will be affected by changing its dependant
                 $childField->attribute = "$parentAttribute---{$childField->attribute}---$elementNumber";
-                $innerFields[] = $childField;
+                $siblings[] = $childField;
 
                 // Prepare dot-notation backend key to be available through request
                 $setAttribute = "$parentAttribute.$triggerAttribute";
@@ -100,7 +100,7 @@ trait DependsOnInnerFields
             }
         }
 
-        return $innerFields;
+        return $siblings;
     }
 
     protected function getTriggerField(NovaRequest $request, mixed $affectedField): ?string
