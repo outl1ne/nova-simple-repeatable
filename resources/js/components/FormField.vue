@@ -8,7 +8,7 @@
     <template #field>
       <div class="flex flex-col" v-bind="extraAttributes">
         <!-- Title columns -->
-        <div v-if="rows.length" class="o1-w-full o1-flex o1-border-b o1-py-2 dark:o1-border-slate-600 mb-1">
+        <div v-if="rows.length" class="mb-1 o1-w-full o1-flex o1-border-b o1-py-2 dark:o1-border-slate-600">
           <div
             v-for="(rowField, i) in fields"
             :key="i"
@@ -101,12 +101,12 @@
 <script>
 import Draggable from 'vuedraggable';
 import { Errors } from 'form-backend-validation';
-import { FormField, HandlesValidationErrors, DependentFormField } from 'laravel-nova';
+import { HandlesValidationErrors, DependentFormField } from 'laravel-nova';
 import HandlesRepeatable from '../mixins/HandlesRepeatable';
 import _set from 'lodash/set';
 
 export default {
-  mixins: [FormField, HandlesValidationErrors, HandlesRepeatable, DependentFormField],
+  mixins: [HandlesValidationErrors, HandlesRepeatable, DependentFormField],
 
   components: { Draggable },
 
