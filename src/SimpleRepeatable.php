@@ -25,7 +25,7 @@ class SimpleRepeatable extends Field
     protected FieldCollection $fields;
     protected Collection $rows;
 
-    public function __construct(string $name, string $attribute = null, array $fields = [])
+    public function __construct(string $name, ?string $attribute = null, array $fields = [])
     {
         parent::__construct($name, $attribute, null);
 
@@ -41,12 +41,12 @@ class SimpleRepeatable extends Field
         $this->fields = FieldCollection::make($fields);
     }
 
-    public function minRows(int $minRows = null): static
+    public function minRows(?int $minRows = null): static
     {
         return $this->withMeta(['minRows' => $minRows]);
     }
 
-    public function maxRows(int $maxRows = null): static
+    public function maxRows(?int $maxRows = null): static
     {
         return $this->withMeta(['maxRows' => $maxRows]);
     }
