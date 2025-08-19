@@ -11,7 +11,7 @@
  * @license MIT
  */
 
-/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+/*! Axios v1.9.0 Copyright (c) 2025 Matt Zabriskie and contributors */
 
 /**!
  * Sortable 1.14.0

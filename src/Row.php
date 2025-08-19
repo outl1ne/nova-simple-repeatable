@@ -8,10 +8,10 @@ use Laravel\Nova\Fields\FieldCollection;
 
 class Row implements JsonSerializable
 {
-    protected $fields;
-    protected $attributes;
+    protected FieldCollection $fields;
+    protected array $attributes;
 
-    public function __construct(FieldCollection $fields, $attributes = [])
+    public function __construct(FieldCollection $fields, array $attributes = [])
     {
         $this->fields = $fields;
         $this->attributes = $attributes;
@@ -19,11 +19,8 @@ class Row implements JsonSerializable
 
     /**
      * Get a cloned instance with set values
-     *
-     * @param array $attributes
-     * @return Row
      */
-    public static function make(FieldCollection $fields, array $attributes = [])
+    public static function make(FieldCollection $fields, array $attributes = []): static
     {
         $newFields = clone $fields;
         return new static($newFields->map(function ($field) {
@@ -33,26 +30,21 @@ class Row implements JsonSerializable
 
     /**
      * Resolve fields using given attributes.
-     *
-     * @return void
      */
-    public function resolve()
+    public function resolve(): void
     {
         $this->fields->each->resolve($this->attributes);
     }
 
-    public function resolveForDisplay()
+    public function resolveForDisplay(): void
     {
         $this->fields->each->resolveForDisplay($this->attributes);
     }
 
     /**
      * Create a working field clone instance
-     *
-     * @param \Laravel\Nova\Fields\Field $original
-     * @return \Laravel\Nova\Fields\Field
      */
-    protected static function cloneField(Field $original)
+    protected static function cloneField(Field $original): Field
     {
         $field = clone $original;
         $callables = ['displayCallback', 'resolveCallback', 'fillCallback', 'requiredCallback'];

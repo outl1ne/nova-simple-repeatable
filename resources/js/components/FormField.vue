@@ -8,7 +8,7 @@
     <template #field>
       <div class="flex flex-col" v-bind="extraAttributes">
         <!-- Title columns -->
-        <div v-if="rows.length" class="o1-w-full o1-flex o1-border-b o1-py-2 dark:o1-border-slate-600 mb-1">
+        <div v-if="rows.length" class="mb-1 o1-w-full o1-flex o1-border-b o1-py-2 dark:o1-border-slate-600">
           <div
             v-for="(rowField, i) in fields"
             :key="i"
@@ -84,15 +84,15 @@
           </template>
         </draggable>
 
-        <DefaultButton
+        <button
           v-if="canAddRows"
           @click="addRow"
-          class="add-button btn btn-default btn-primary"
-          :class="{ 'delete-width': canDeleteRows, 'mt-3': rows.length }"
+          class="focus:outline-none focus:ring rounded border-2 border-primary-300 dark:border-gray-500 hover:border-primary-500 active:border-primary-400 dark:hover:border-gray-400 dark:active:border-gray-300 bg-white dark:bg-transparent text-primary-500 dark:text-gray-400 mx-auto px-3 h-9 font-bold shrink-0"
+          :class="{ 'mt-3': rows.length }"
           type="button"
         >
-          {{ field.addRowLabel }}
-        </DefaultButton>
+          <span>{{ field.addRowLabel }}</span>
+        </button>
       </div>
     </template>
   </DefaultField>
@@ -100,13 +100,12 @@
 
 <script>
 import Draggable from 'vuedraggable';
-import { Errors } from 'form-backend-validation';
-import { FormField, HandlesValidationErrors, DependentFormField } from 'laravel-nova';
+import { HandlesValidationErrors, DependentFormField, Errors } from 'laravel-nova';
 import HandlesRepeatable from '../mixins/HandlesRepeatable';
 import _set from 'lodash/set';
 
 export default {
-  mixins: [FormField, HandlesValidationErrors, HandlesRepeatable, DependentFormField],
+  mixins: [HandlesValidationErrors, HandlesRepeatable, DependentFormField],
 
   components: { Draggable },
 

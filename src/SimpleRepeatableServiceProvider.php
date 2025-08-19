@@ -11,7 +11,7 @@ class SimpleRepeatableServiceProvider extends ServiceProvider
 {
     use LoadsNovaTranslations;
 
-    public function boot()
+    public function boot(): void
     {
         Nova::serving(function (ServingNova $event) {
             Nova::script('simple-repeatable', __DIR__ . '/../dist/js/entry.js');
@@ -19,10 +19,5 @@ class SimpleRepeatableServiceProvider extends ServiceProvider
         });
 
         $this->loadTranslations(__DIR__ . '/../lang', 'nova-simple-repeatable-field', true);
-    }
-
-    public function register()
-    {
-        //
     }
 }
