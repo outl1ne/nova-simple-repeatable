@@ -22,10 +22,10 @@ class SimpleRepeatable extends Field
 
     public $component = 'simple-repeatable';
 
-    protected $fields = [];
-    protected $rows = [];
+    protected FieldCollection $fields;
+    protected Collection $rows;
 
-    public function __construct($name, $attribute = null, $fields = [])
+    public function __construct(string $name, ?string $attribute = null, array $fields = [])
     {
         parent::__construct($name, $attribute, null);
 
@@ -36,32 +36,32 @@ class SimpleRepeatable extends Field
         $this->addRowLabel(__('simpleRepeatable.addRow'));
     }
 
-    public function fields($fields = [])
+    public function fields(array $fields = []): void
     {
         $this->fields = FieldCollection::make($fields);
     }
 
-    public function minRows($minRows = null)
+    public function minRows(?int $minRows = null): static
     {
         return $this->withMeta(['minRows' => $minRows]);
     }
 
-    public function maxRows($maxRows = null)
+    public function maxRows(?int $maxRows = null): static
     {
         return $this->withMeta(['maxRows' => $maxRows]);
     }
 
-    public function canAddRows($canAddRows = true)
+    public function canAddRows(bool $canAddRows = true): static
     {
         return $this->withMeta(['canAddRows' => $canAddRows]);
     }
 
-    public function canDeleteRows($canDeleteRows = true)
+    public function canDeleteRows(bool $canDeleteRows = true): static
     {
         return $this->withMeta(['canDeleteRows' => $canDeleteRows]);
     }
 
-    public function addRowLabel($label)
+    public function addRowLabel(string $label): static
     {
         return $this->withMeta(['addRowLabel' => $label]);
     }
@@ -72,15 +72,14 @@ class SimpleRepeatable extends Field
      *
      * Currently disabled, calling this will do nothing
      */
-    public function json()
+    public function json(): static
     {
         return $this->withMeta(['convertFormDataToJson' => true]);
     }
 
-    protected function isJson()
+    protected function isJson(): bool
     {
-        if (empty($this->meta['convertFormDataToJson'])) return false;
-        return $this->meta['convertFormDataToJson'];
+        return (bool)($this->meta['convertFormDataToJson'] ?? false);
     }
 
     /**
@@ -92,19 +91,19 @@ class SimpleRepeatable extends Field
      * @param $model
      * @param $attribute
      */
-    protected function fillAttributeFromRequest(NovaRequest $request, $requestAttribute, $model, $attribute)
+    protected function fillAttributeFromRequest(NovaRequest $request, string $requestAttribute, object $model, string $attribute)
     {
         $value = $request->input($requestAttribute) ?? null;
         $value = json_decode($value, true);
 
         // Do validation
-        $rules = $this->getFormattedRules($request);
+        $rules = $this->getRules($request);
         Validator::make([$this->attribute => $value], $rules)->validate();
 
         $model->{$attribute} = $value;
     }
 
-    public function fill(NovaRequest $request, $model)
+    public function fill(NovaRequest $request, object $model)
     {
         if (get_class($model) === 'Whitecube\NovaFlexibleContent\Layouts\Layout') {
             $value = $request->input($this->attribute) ?? null;
@@ -113,17 +112,16 @@ class SimpleRepeatable extends Field
             // Do validation
             if ($request->resourceId) $this->resource = $request->findModelOrFail();
 
-            // Explicity resolve fields to get valid nova-translatable rules
+            // Explicitly resolve fields to get valid nova-translatable rules
             $this->fields->each->resolve($request);
 
-            $rules = $this->getFormattedRules($request);
+            $rules = $this->getRules($request);
             Validator::make([$this->attribute => $value], $rules)->validate();
         }
-
-        parent::fill($request, $model);
+        return parent::fill($request, $model);
     }
 
-    protected function getFormattedRules(NovaRequest $request)
+    public function getRules(NovaRequest $request): array
     {
         $rules = static::formatRules(
             $request,
@@ -146,7 +144,6 @@ class SimpleRepeatable extends Field
             } catch (Exception $e) {
             }
         }
-
         return $rules;
     }
 
@@ -157,7 +154,7 @@ class SimpleRepeatable extends Field
      * @param string|null $attribute
      * @return void
      */
-    public function resolve($resource, $attribute = null)
+    public function resolve($resource, ?string $attribute = null): void
     {
         $novaRequest = app()->make(NovaRequest::class);
         $resolveForDisplay = $novaRequest->isResourceIndexRequest() || $novaRequest->isResourceDetailRequest();
@@ -176,19 +173,14 @@ class SimpleRepeatable extends Field
             'rows' => $this->rows,
             'fields' => $this->fields->resolve(null) // Empty fields
         ]);
-
-        return parent::resolve($resource, $attribute);
+        parent::resolve($resource, $attribute);
     }
 
     /**
      * Define the field's actual rows (as "base models") based
      * on the field's current model & attribute
-     *
-     * @param mixed $resource
-     * @param string $attribute
-     * @return Illuminate\Support\Collection
      */
-    public function buildRows($resource, $attribute)
+    public function buildRows(mixed $resource, string $attribute): Collection
     {
         $value = $this->extractValueFromResource($resource, $attribute);
         return collect($value)->map(function ($rowValue) {
@@ -198,12 +190,8 @@ class SimpleRepeatable extends Field
 
     /**
      * Find the attribute's value in the given resource
-     *
-     * @param mixed $resource
-     * @param string $attribute
-     * @return array
      */
-    protected function extractValueFromResource($resource, $attribute)
+    protected function extractValueFromResource(mixed $resource, string $attribute): array
     {
         $value = $this->resolveAttribute($resource, $attribute);
 
