@@ -234,6 +234,14 @@ export default {
       return true;
     },
   },
+
+  mounted() {
+    if (this.currentField.minRows >= 1) {
+      for (var i = 0; i < this.currentField.minRows; i++) {
+        this.addRow()
+      }
+    }
+  }
 };
 </script>
 
