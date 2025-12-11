@@ -122,7 +122,11 @@ export default {
         const rowValues = {};
 
         // Fill formData with field values
-        row.forEach(field => field.fill(formData));
+        row.forEach(field => {
+          if (typeof field?.fill === 'function') {
+            field.fill(formData);
+          }
+        });
 
         // Save field values to rowValues
         for (const item of formData) {
