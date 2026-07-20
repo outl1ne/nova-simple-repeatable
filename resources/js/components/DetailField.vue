@@ -1,5 +1,10 @@
 <template>
-  <PanelItem :index="index" :field="field" class="simple-repeatable detail-field">
+  <PanelItem
+    :index="index"
+    :field="field"
+    class="simple-repeatable detail-field"
+    :class="{ 'simple-repeatable-stacked': field.stacked }"
+  >
     <template #value>
       <div
         class="o1-overflow-hidden o1-relative o1-rounded-lg o1-shadow o1-border o1-border-slate-200 dark:o1-border-slate-600 bg-white dark:o1-bg-slate-800"
@@ -164,6 +169,26 @@ export default {
   .simple-repeatable-table-row {
     td {
       padding: 4px 8px;
+    }
+  }
+
+  &.simple-repeatable-stacked {
+    flex-direction: column;
+
+    > :first-child {
+      width: 100%;
+      padding-bottom: 0;
+      margin-bottom: 0;
+    }
+
+    > :last-child {
+      width: 100%;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding-left: 8px;
     }
   }
 }
